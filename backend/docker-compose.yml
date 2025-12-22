@@ -7,9 +7,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: flipbook_db
-      POSTGRES_USER: flipbook_user
-      POSTGRES_PASSWORD: flipbook_password
+      POSTGRES_DB: ariandoc_db
+      POSTGRES_USER: ariandoc_user
+      POSTGRES_PASSWORD: ariandoc_password
     ports:
       - "5432:5432"
 
@@ -31,9 +31,9 @@ services:
     environment:
       - DEBUG=True
       - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=flipbook_db
-      - DB_USER=flipbook_user
-      - DB_PASSWORD=flipbook_password
+      - DB_NAME=ariandoc_db
+      - DB_USER=ariandoc_user
+      - DB_PASSWORD=ariandoc_password
       - DB_HOST=db
       - DB_PORT=5432
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -55,9 +55,9 @@ services:
     environment:
       - DEBUG=True
       - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=flipbook_db
-      - DB_USER=flipbook_user
-      - DB_PASSWORD=flipbook_password
+      - DB_NAME=ariandoc_db
+      - DB_USER=ariandoc_user
+      - DB_PASSWORD=ariandoc_password
       - DB_HOST=db
       - DB_PORT=5432
       - CELERY_BROKER_URL=redis://redis:6379/0

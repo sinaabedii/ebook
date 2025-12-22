@@ -5,6 +5,7 @@ URL configuration for the Core API.
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+from .health import HealthCheckView, ReadinessCheckView, StatsView
 
 router = DefaultRouter()
 router.register(r'books', views.BookViewSet, basename='book')
@@ -25,4 +26,9 @@ urlpatterns = [
     
     # Reading progress
     path('progress/<int:book_id>/', views.ReadingProgressView.as_view(), name='reading-progress'),
+    
+    # Health & Monitoring
+    path('health/', HealthCheckView.as_view(), name='health-check'),
+    path('ready/', ReadinessCheckView.as_view(), name='readiness-check'),
+    path('stats/', StatsView.as_view(), name='stats'),
 ]

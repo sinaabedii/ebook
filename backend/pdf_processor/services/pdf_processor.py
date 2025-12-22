@@ -144,10 +144,27 @@ class PdfProcessorService:
         """
         Render a PDF page to an image.
         
-        Tries to use pdf2image (requires poppler), falls back to PyMuPDF if available,
-        or creates a placeholder image.
+        Tries pypdfium2 first, then pdf2image, then PyMuPDF, or creates placeholder.
         """
-        # Try pdf2image first (best quality)
+        # Try pypdfium2 first (works well on Windows)
+        try:
+            import pypdfium2 as pdfium
+            pdf = pdfium.PdfDocument(pdf_path)
+            page = pdf[page_num - 1]  # 0-indexed
+            
+            # Render at target DPI
+            scale = self.page_dpi / 72
+            bitmap = page.render(scale=scale)
+            img = bitmap.to_pil()
+            
+            pdf.close()
+            return img
+        except ImportError:
+            logger.warning("pypdfium2 not available, trying alternatives")
+        except Exception as e:
+            logger.warning(f"pypdfium2 failed: {e}, trying alternatives")
+        
+        # Try pdf2image (requires poppler)
         try:
             from pdf2image import convert_from_path
             images = convert_from_path(

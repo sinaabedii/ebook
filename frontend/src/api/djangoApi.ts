@@ -1,5 +1,8 @@
 import axios, { AxiosInstance, AxiosProgressEvent } from 'axios';
-import type { Book, Page, Bookmark, UploadResponse, PaginatedResponse, ApiResponse } from '@/types';
+import type { 
+  Book, Page, Bookmark, UploadResponse, PaginatedResponse, ApiResponse,
+  User, AuthResponse, OTPResponse, OTPVerifyResponse 
+} from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
@@ -124,7 +127,22 @@ export const uploadApi = {
 export const pagesApi = {
   // Get all pages for a book
   getPages: async (bookId: number): Promise<Page[]> => {
-    const response = await api.get<Page[]>(`/pages/${bookId}/`);
+    const response = await api.get(`/pages/${bookId}/`);
+    // Handle both paginated and non-paginated responses
+    if (response.data.results) {
+      // Paginated response - fetch all pages
+      let allPages: Page[] = response.data.results;
+      let nextUrl = response.data.next;
+      
+      // Fetch remaining pages if paginated
+      while (nextUrl) {
+        const nextResponse = await axios.get(nextUrl);
+        allPages = [...allPages, ...nextResponse.data.results];
+        nextUrl = nextResponse.data.next;
+      }
+      return allPages;
+    }
+    // Non-paginated response
     return response.data;
   },
 
@@ -168,6 +186,90 @@ export const bookmarkApi = {
   // Delete bookmark
   deleteBookmark: async (id: number): Promise<void> => {
     await api.delete(`/bookmarks/${id}/`);
+  },
+};
+
+// ==================== Auth API ====================
+export const authApi = {
+  // Request OTP code
+  requestOTP: async (phone: string): Promise<OTPResponse> => {
+    const response = await api.post<OTPResponse>('/auth/otp/request/', { phone });
+    return response.data;
+  },
+
+  // Verify OTP code
+  verifyOTP: async (phone: string, code: string): Promise<OTPVerifyResponse> => {
+    const response = await api.post<OTPVerifyResponse>('/auth/otp/verify/', { phone, code });
+    return response.data;
+  },
+
+  // Register new user
+  register: async (data: {
+    phone: string;
+    code: string;
+    first_name?: string;
+    last_name?: string;
+    password?: string;
+    organization_code?: string;
+  }): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/register/', data);
+    // Store token
+    if (response.data.access_token && typeof window !== 'undefined') {
+      localStorage.setItem('auth_token', response.data.access_token);
+    }
+    return response.data;
+  },
+
+  // Login with OTP
+  login: async (phone: string, code: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/login/', { phone, code });
+    // Store token
+    if (response.data.access_token && typeof window !== 'undefined') {
+      localStorage.setItem('auth_token', response.data.access_token);
+    }
+    return response.data;
+  },
+
+  // Logout
+  logout: async (): Promise<void> => {
+    try {
+      await api.post('/auth/logout/');
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+      }
+    }
+  },
+
+  // Get current user profile
+  getProfile: async (): Promise<User> => {
+    const response = await api.get<User>('/auth/profile/');
+    return response.data;
+  },
+
+  // Update profile
+  updateProfile: async (data: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    national_id?: string;
+  }): Promise<User> => {
+    const response = await api.patch<User>('/auth/profile/', data);
+    return response.data;
+  },
+
+  // Change password
+  changePassword: async (
+    oldPassword: string, 
+    newPassword: string, 
+    newPasswordConfirm: string
+  ): Promise<{ message: string }> => {
+    const response = await api.post('/auth/change-password/', {
+      old_password: oldPassword,
+      new_password: newPassword,
+      new_password_confirm: newPasswordConfirm,
+    });
+    return response.data;
   },
 };
 

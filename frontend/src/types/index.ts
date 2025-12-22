@@ -140,3 +140,59 @@ export interface Toast {
   message: string;
   duration?: number;
 }
+
+// ==================== Auth Types ====================
+export interface User {
+  id: number;
+  phone: string;
+  email?: string;
+  first_name: string;
+  last_name: string;
+  full_name?: string;
+  national_id?: string;
+  avatar?: string;
+  organization?: number;
+  organization_name?: string;
+  role: 'admin' | 'org_admin' | 'manager' | 'member';
+  is_verified: boolean;
+  date_joined: string;
+}
+
+export interface Organization {
+  id: number;
+  name: string;
+  slug: string;
+  logo?: string;
+  description?: string;
+  is_active: boolean;
+  max_users: number;
+  user_count: number;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  user: User;
+  message?: string;
+}
+
+export interface OTPResponse {
+  message: string;
+  expires_in: number;
+  debug_code?: string; // Only in development
+}
+
+export interface OTPVerifyResponse {
+  valid: boolean;
+  user_exists: boolean;
+  message: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}

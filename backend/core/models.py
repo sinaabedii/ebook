@@ -92,6 +92,12 @@ class Book(models.Model):
         verbose_name = 'کتاب'
         verbose_name_plural = 'کتاب‌ها'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['processing_status']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['title']),
+            models.Index(fields=['uploaded_by', 'created_at']),
+        ]
 
     def __str__(self):
         return self.title
@@ -159,7 +165,12 @@ class BookPage(models.Model):
         verbose_name = 'صفحه کتاب'
         verbose_name_plural = 'صفحات کتاب'
         ordering = ['book', 'page_number']
-        unique_together = ['book', 'page_number']
+        constraints = [
+            models.UniqueConstraint(fields=['book', 'page_number'], name='unique_book_page')
+        ]
+        indexes = [
+            models.Index(fields=['book', 'page_number']),
+        ]
 
     def __str__(self):
         return f'{self.book.title} - صفحه {self.page_number}'

@@ -222,13 +222,13 @@ export const FlipBookViewer: React.FC<FlipBookViewerProps> = ({
     <div
       ref={containerRef}
       className={`
-        flex flex-col bg-slate-900 rounded-xl overflow-hidden
+        flex flex-col bg-surface-950 rounded-xl overflow-hidden
         ${isFullscreen ? 'fixed inset-0 z-50 rounded-none' : ''}
         ${className}
       `}
     >
       {/* Controls - Top */}
-      <div className="flex-shrink-0 p-4 border-b border-slate-700/50 glass">
+      <div className="flex-shrink-0 p-2 sm:p-4 border-b border-surface-800/50 bg-surface-900/50 backdrop-blur-sm">
         {isMobile || isTablet ? (
           <CompactPageControls
             currentPage={currentPage}
@@ -252,16 +252,17 @@ export const FlipBookViewer: React.FC<FlipBookViewerProps> = ({
 
       {/* Book Area */}
       <div
-        className="flex-1 flex items-center justify-center p-4 overflow-auto"
+        className="flex-1 flex items-center justify-center p-2 sm:p-4 overflow-auto bg-gradient-to-b from-surface-900 to-surface-950"
         {...handlers}
       >
         <div
-          className="book-container flex gap-1"
+          className="realistic-book"
           style={{
             transform: `scale(${isFlipping ? 0.98 : 1})`,
             transition: 'transform 0.3s ease-out',
           }}
         >
+        <div className="realistic-book-wrapper flex gap-0.5 sm:gap-1">
           {/* Left Page (in double mode) */}
           {settings.pageMode === 'double' && !isMobile && currentPage > 1 && (
             <div
@@ -312,11 +313,14 @@ export const FlipBookViewer: React.FC<FlipBookViewerProps> = ({
             />
           </div>
         </div>
+        {/* Book Shadow */}
+        <div className="book-shadow" />
+        </div>
       </div>
 
       {/* Thumbnail Strip */}
       {settings.showThumbnails && !isMobile && (
-        <div className="flex-shrink-0 border-t border-slate-700/50 p-2">
+        <div className="flex-shrink-0 border-t border-surface-800/50 p-2 bg-surface-900/30">
           <div className="thumbnail-strip">
             {Array.from({ length: effectivePages }, (_, i) => i + 1).map((pageNum) => (
               <PageThumbnail

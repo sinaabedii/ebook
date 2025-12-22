@@ -205,36 +205,36 @@ export const CompactPageControls: React.FC<Omit<PageControlsProps, 'settings' | 
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage <= 1}
-        className="control-btn"
+        className="p-2 sm:p-2.5 rounded-lg bg-surface-800/50 text-surface-300 hover:bg-surface-700 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="صفحه قبل"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-white">{currentPage}</span>
-        <span className="text-slate-500">/</span>
-        <span className="text-slate-400">{totalPages}</span>
+      <div className="flex items-center gap-2 text-sm sm:text-base bg-surface-800/30 px-3 py-1.5 rounded-lg">
+        <span className="text-white font-medium">{currentPage}</span>
+        <span className="text-surface-600">/</span>
+        <span className="text-surface-400">{totalPages}</span>
       </div>
 
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage >= totalPages}
-        className="control-btn"
+        className="p-2 sm:p-2.5 rounded-lg bg-surface-800/50 text-surface-300 hover:bg-surface-700 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="صفحه بعد"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
 
       <button
         onClick={onToggleFullscreen}
-        className="control-btn"
+        className="p-2 sm:p-2.5 rounded-lg bg-surface-800/50 text-surface-300 hover:bg-surface-700 hover:text-white transition-colors"
         aria-label={isFullscreen ? 'خروج از تمام صفحه' : 'تمام صفحه'}
       >
         {isFullscreen ? (
-          <Minimize className="w-5 h-5" />
+          <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
         ) : (
-          <Maximize className="w-5 h-5" />
+          <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
         )}
       </button>
     </div>

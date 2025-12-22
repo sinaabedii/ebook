@@ -1,5 +1,6 @@
 """
-URL configuration for flipbook_backend project.
+URL configuration for ArianDoc project.
+سامانه مدیریت اسناد دیجیتال هلدینگ آرین سعید
 """
 
 from django.contrib import admin
@@ -13,9 +14,9 @@ from drf_yasg import openapi
 # Swagger/OpenAPI documentation
 schema_view = get_schema_view(
     openapi.Info(
-        title="FlipBook API",
+        title="ArianDoc API",
         default_version='v1',
-        description="Interactive E-Book Platform API - کتابخانه دیجیتال تعاملی",
+        description="ArianDoc API - سامانه مدیریت اسناد دیجیتال هلدینگ آرین سعید",
         terms_of_service="https://www.example.com/terms/",
         contact=openapi.Contact(email="support@example.com"),
         license=openapi.License(name="MIT License"),
@@ -30,6 +31,7 @@ urlpatterns = [
     
     # API
     path('api/', include('core.urls')),
+    path('api/auth/', include('accounts.urls')),
     
     # Swagger documentation
     path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),

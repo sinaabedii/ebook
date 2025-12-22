@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 import { ResponsiveLayout } from '@/components/layout';
 import { PdfUploader } from '@/components/pdf';
 import { uploadApi, handleApiError } from '@/api/djangoApi';
-import { FileText, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { useLanguage } from '@/contexts';
+import { FileText, CheckCircle, AlertCircle, Loader, Upload, BookOpen, ArrowRight } from 'lucide-react';
 
 type UploadStep = 'select' | 'metadata' | 'uploading' | 'processing' | 'complete' | 'error';
 
@@ -14,6 +15,7 @@ interface BookMetadata {
 
 export default function UploadPage() {
   const router = useRouter();
+  const { t, language } = useLanguage();
   const [step, setStep] = useState<UploadStep>('select');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [metadata, setMetadata] = useState<BookMetadata>({ title: '', description: '' });
@@ -54,7 +56,7 @@ export default function UploadPage() {
         pollProcessingStatus(response.book_id);
       } else {
         setStep('error');
-        setErrorMessage('خطا در آپلود فایل');
+        setErrorMessage(t('upload.error'));
       }
     } catch (error) {
       setStep('error');
@@ -75,7 +77,7 @@ export default function UploadPage() {
           return;
         } else if (status.status === 'failed') {
           setStep('error');
-          setErrorMessage(status.message || 'خطا در پردازش فایل');
+          setErrorMessage(status.message || t('upload.error'));
           return;
         }
 
@@ -84,7 +86,7 @@ export default function UploadPage() {
           setTimeout(checkStatus, 5000);
         } else {
           setStep('error');
-          setErrorMessage('پردازش فایل بیش از حد طول کشید');
+          setErrorMessage(t('upload.error'));
         }
       } catch (error) {
         setStep('error');
@@ -111,42 +113,51 @@ export default function UploadPage() {
   };
 
   return (
-    <ResponsiveLayout title="آپلود کتاب" showBackButton>
-      <div className="max-w-2xl mx-auto">
+    <ResponsiveLayout showBackButton>
+      <div className="max-w-2xl mx-auto pt-4">
+        {/* Page Header */}
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/25 mb-3 sm:mb-4">
+            <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--text-primary)' }}>{t('upload.title')}</h1>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('home.subtitle')}</p>
+        </div>
+
         {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8">
+        <div className="flex items-center justify-center mb-6 sm:mb-8">
           <StepIndicator 
             step={1} 
-            label="انتخاب فایل" 
+            label={t('upload.step1')} 
             isActive={step === 'select'} 
             isCompleted={['metadata', 'uploading', 'processing', 'complete'].includes(step)} 
           />
-          <div className="w-12 h-0.5 bg-slate-700 mx-2" />
+          <div className={`w-6 sm:w-12 h-0.5 mx-1 sm:mx-2 transition-colors ${['metadata', 'uploading', 'processing', 'complete'].includes(step) ? 'bg-primary-500' : ''}`} style={{ backgroundColor: !['metadata', 'uploading', 'processing', 'complete'].includes(step) ? 'var(--border-color)' : undefined }} />
           <StepIndicator 
             step={2} 
-            label="اطلاعات" 
+            label={t('upload.step2')} 
             isActive={step === 'metadata'} 
             isCompleted={['uploading', 'processing', 'complete'].includes(step)} 
           />
-          <div className="w-12 h-0.5 bg-slate-700 mx-2" />
+          <div className={`w-6 sm:w-12 h-0.5 mx-1 sm:mx-2 transition-colors ${['uploading', 'processing', 'complete'].includes(step) ? 'bg-primary-500' : ''}`} style={{ backgroundColor: !['uploading', 'processing', 'complete'].includes(step) ? 'var(--border-color)' : undefined }} />
           <StepIndicator 
             step={3} 
-            label="آپلود" 
+            label={t('upload.step3')} 
             isActive={['uploading', 'processing'].includes(step)} 
             isCompleted={step === 'complete'} 
           />
         </div>
 
         {/* Step Content */}
-        <div className="glass rounded-2xl p-8">
+        <div className="card rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8">
           {/* Step 1: File Selection */}
           {step === 'select' && (
             <div>
-              <h2 className="text-2xl font-bold text-white mb-2 text-center">
-                فایل PDF خود را انتخاب کنید
+              <h2 className="text-base sm:text-xl font-semibold mb-2 text-center" style={{ color: 'var(--text-primary)' }}>
+                {t('upload.dragDrop')}
               </h2>
-              <p className="text-slate-400 text-center mb-8">
-                فایل‌های تا 500 مگابایت پشتیبانی می‌شوند
+              <p className="text-center mb-6 sm:mb-8 text-xs sm:text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                {t('upload.maxSize')}
               </p>
               
               <PdfUploader
@@ -159,55 +170,52 @@ export default function UploadPage() {
           {/* Step 2: Metadata Form */}
           {step === 'metadata' && selectedFile && (
             <form onSubmit={handleMetadataSubmit}>
-              <h2 className="text-2xl font-bold text-white mb-6 text-center">
-                اطلاعات کتاب
+              <h2 className="text-xl font-semibold mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
+                {t('upload.step2')}
               </h2>
 
               {/* File Preview */}
-              <div className="flex items-center gap-4 p-4 bg-slate-800/50 rounded-xl mb-6">
-                <div className="p-3 rounded-lg bg-primary-500/20">
-                  <FileText className="w-8 h-8 text-primary-400" />
+              <div className="flex items-center gap-4 p-4 rounded-xl mb-6" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)' }}>
+                <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 border border-primary-500/20">
+                  <FileText className="w-7 h-7 text-primary-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate">{selectedFile.name}</p>
-                  <p className="text-sm text-slate-400">
+                  <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>{selectedFile.name}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
                     {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
                 </div>
+                <div className="badge-success">✓</div>
               </div>
 
               {/* Title Input */}
               <div className="mb-4">
-                <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-2">
-                  عنوان کتاب *
+                <label htmlFor="title" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  {t('upload.bookTitle')} *
                 </label>
                 <input
                   type="text"
                   id="title"
                   value={metadata.title}
                   onChange={(e) => setMetadata(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 
-                           text-white placeholder-slate-500 focus:border-primary-500 
-                           focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
-                  placeholder="عنوان کتاب را وارد کنید"
+                  className="input"
+                  placeholder={t('upload.bookTitlePlaceholder')}
                   required
                 />
               </div>
 
               {/* Description Input */}
               <div className="mb-6">
-                <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
-                  توضیحات (اختیاری)
+                <label htmlFor="description" className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  {t('upload.bookDescription')}
                 </label>
                 <textarea
                   id="description"
                   value={metadata.description}
                   onChange={(e) => setMetadata(prev => ({ ...prev, description: e.target.value }))}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 
-                           text-white placeholder-slate-500 focus:border-primary-500 
-                           focus:ring-1 focus:ring-primary-500 outline-none transition-colors resize-none"
-                  placeholder="توضیحات کتاب را وارد کنید..."
+                  className="input resize-none"
+                  placeholder={t('upload.bookDescriptionPlaceholder')}
                 />
               </div>
 
@@ -216,17 +224,16 @@ export default function UploadPage() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="flex-1 py-3 px-6 rounded-lg bg-slate-700 text-white 
-                           hover:bg-slate-600 transition-colors"
+                  className="btn-secondary flex-1"
                 >
-                  بازگشت
+                  {t('common.back')}
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-3 px-6 rounded-lg bg-primary-500 text-white 
-                           hover:bg-primary-600 transition-colors font-medium"
+                  className="btn-primary flex-1"
                 >
-                  آپلود کتاب
+                  <Upload className="w-4 h-4" />
+                  {t('upload.uploadButton')}
                 </button>
               </div>
             </form>
@@ -234,76 +241,70 @@ export default function UploadPage() {
 
           {/* Step 3: Uploading */}
           {step === 'uploading' && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-6 relative">
-                <Loader className="w-full h-full text-primary-500 animate-spin" />
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-6 relative">
+                <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border-color)' }} />
+                <div className="absolute inset-0 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+                <div className="absolute inset-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                  <span className="text-xl font-bold text-primary-400">{uploadProgress}%</span>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                در حال آپلود...
+              <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                {t('upload.uploading')}
               </h2>
-              <p className="text-slate-400 mb-6">
-                لطفاً صبر کنید تا فایل آپلود شود
+              <p className="mb-6 text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                {t('common.loading')}
               </p>
               
               {/* Progress Bar */}
-              <div className="w-full max-w-xs mx-auto">
-                <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary-500 transition-all duration-300 rounded-full"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
+              <div className="w-full max-w-sm mx-auto">
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${uploadProgress}%` }} />
                 </div>
-                <p className="text-sm text-slate-400 mt-2">{uploadProgress}%</p>
               </div>
             </div>
           )}
 
           {/* Step 3b: Processing */}
           {step === 'processing' && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-6 relative">
-                <div className="absolute inset-0 rounded-full border-4 border-slate-700" />
-                <div className="absolute inset-0 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-6 relative">
+                <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border-color)' }} />
+                <div className="absolute inset-0 rounded-full border-4 border-accent-500 border-t-transparent animate-spin" />
+                <div className="absolute inset-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                  <BookOpen className="w-8 h-8 text-accent-400" />
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                در حال پردازش...
+              <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                {t('upload.processing')}
               </h2>
-              <p className="text-slate-400">
-                فایل در حال تبدیل به صفحات قابل نمایش است
-              </p>
-              <p className="text-sm text-slate-500 mt-2">
-                این عملیات ممکن است چند دقیقه طول بکشد
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                {t('upload.preparingPages')}
               </p>
             </div>
           )}
 
           {/* Complete */}
           {step === 'complete' && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-green-400" />
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-accent-500/20 to-accent-600/20 border border-accent-500/30 flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-accent-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                آپلود موفقیت‌آمیز!
+              <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                {t('upload.success')}
               </h2>
-              <p className="text-slate-400 mb-8">
-                کتاب شما با موفقیت آپلود و پردازش شد
+              <p className="mb-8 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                {t('upload.successDesc')}
               </p>
               
               <div className="flex gap-4 justify-center">
-                <button
-                  onClick={handleReset}
-                  className="py-3 px-6 rounded-lg bg-slate-700 text-white 
-                           hover:bg-slate-600 transition-colors"
-                >
-                  آپلود کتاب جدید
+                <button onClick={handleReset} className="btn-secondary">
+                  <Upload className="w-4 h-4" />
+                  {t('upload.uploadAnother')}
                 </button>
-                <button
-                  onClick={handleViewBook}
-                  className="py-3 px-6 rounded-lg bg-primary-500 text-white 
-                           hover:bg-primary-600 transition-colors font-medium"
-                >
-                  مشاهده کتاب
+                <button onClick={handleViewBook} className="btn-primary">
+                  <BookOpen className="w-4 h-4" />
+                  {t('upload.viewBook')}
                 </button>
               </div>
             </div>
@@ -311,23 +312,19 @@ export default function UploadPage() {
 
           {/* Error */}
           {step === 'error' && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
+            <div className="text-center py-12">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-500/20 to-red-600/20 border border-red-500/30 flex items-center justify-center">
                 <AlertCircle className="w-10 h-10 text-red-400" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                خطا در آپلود
+              <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                {t('upload.error')}
               </h2>
-              <p className="text-red-400 mb-8">
+              <p className="text-red-400 mb-8 text-sm">
                 {errorMessage}
               </p>
               
-              <button
-                onClick={handleReset}
-                className="py-3 px-6 rounded-lg bg-primary-500 text-white 
-                         hover:bg-primary-600 transition-colors font-medium"
-              >
-                تلاش مجدد
+              <button onClick={handleReset} className="btn-primary">
+                {t('upload.tryAgain')}
               </button>
             </div>
           )}
@@ -349,21 +346,23 @@ function StepIndicator({ step, label, isActive, isCompleted }: StepIndicatorProp
   return (
     <div className="flex flex-col items-center">
       <div className={`
-        w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm
-        transition-all duration-300
-        ${isCompleted ? 'bg-green-500 text-white' : ''}
-        ${isActive ? 'bg-primary-500 text-white ring-4 ring-primary-500/30' : ''}
-        ${!isActive && !isCompleted ? 'bg-slate-700 text-slate-400' : ''}
+        w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-semibold text-xs sm:text-sm
+        transition-all duration-300 border-2
+        ${isCompleted ? 'bg-accent-500 border-accent-500 text-white shadow-lg shadow-accent-500/25' : ''}
+        ${isActive ? 'bg-primary-500 border-primary-500 text-white shadow-lg shadow-primary-500/25' : ''}
+        ${!isActive && !isCompleted ? 'bg-surface-800 border-surface-700 text-surface-500' : ''}
       `}>
         {isCompleted ? (
-          <CheckCircle className="w-5 h-5" />
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
         ) : (
           step
         )}
       </div>
       <span className={`
-        text-xs mt-2 transition-colors
-        ${isActive ? 'text-primary-400' : 'text-slate-500'}
+        text-[10px] sm:text-xs mt-1.5 sm:mt-2 font-medium transition-colors
+        ${isCompleted ? 'text-accent-400' : ''}
+        ${isActive ? 'text-primary-400' : ''}
+        ${!isActive && !isCompleted ? 'text-surface-500' : ''}
       `}>
         {label}
       </span>

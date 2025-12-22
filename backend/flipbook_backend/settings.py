@@ -1,5 +1,6 @@
 """
-Django settings for flipbook_backend project.
+Django settings for ArianDoc project.
+سامانه مدیریت اسناد دیجیتال هلدینگ آرین سعید
 """
 
 import os
@@ -36,9 +37,13 @@ INSTALLED_APPS = [
     'drf_yasg',
     
     # Local apps
+    'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
     'pdf_processor.apps.PdfProcessorConfig',
 ]
+
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -116,6 +121,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'accounts.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -128,11 +134,23 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all origins in development
 CORS_ALLOWED_ORIGINS = os.getenv(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000'
+    'http://localhost:3000,http://localhost:3004,http://127.0.0.1:3000,http://127.0.0.1:3004'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 500MB

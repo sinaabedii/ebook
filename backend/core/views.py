@@ -1,6 +1,8 @@
 """
 API Views for the E-Book Platform.
 """
+import logging
+from typing import Optional
 
 from rest_framework import viewsets, status, generics
 from rest_framework.views import APIView
@@ -9,7 +11,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Prefetch
+from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -24,6 +27,17 @@ from .serializers import (
     ReadingProgressSerializer,
     UploadResponseSerializer,
 )
+from .exceptions import (
+    BookNotFoundError,
+    BookProcessingError,
+    InvalidFileError,
+    FileTooLargeError,
+    PageNotFoundError,
+    BookNotProcessedError,
+)
+from .services import BackgroundTaskManager
+
+logger = logging.getLogger(__name__)
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -89,32 +103,70 @@ class PdfUploadView(APIView):
         serializer = BookUploadSerializer(data=request.data)
         
         if not serializer.is_valid():
+            logger.warning(f"Invalid upload request: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         file = serializer.validated_data['file']
-        title = serializer.validated_data.get('title') or file.name.replace('.pdf', '').replace('_', ' ')
+        title = serializer.validated_data.get('title') or self._extract_title(file.name)
         description = serializer.validated_data.get('description', '')
         
-        # Create book instance
-        book = Book.objects.create(
-            title=title,
-            description=description,
-            pdf_file=file,
-            file_size=file.size,
-            processing_status=Book.ProcessingStatus.PROCESSING,
-            uploaded_by=request.user if request.user.is_authenticated else None,
-        )
+        # Create book instance with transaction
+        with transaction.atomic():
+            book = Book.objects.create(
+                title=title,
+                description=description,
+                pdf_file=file,
+                file_size=file.size,
+                processing_status=Book.ProcessingStatus.PROCESSING,
+                uploaded_by=request.user if request.user.is_authenticated else None,
+            )
         
-        # Trigger async PDF processing
-        from pdf_processor.tasks import process_pdf_task
-        process_pdf_task.delay(book.id)
+        logger.info(f"Book created: {book.id} - {book.title}")
+        
+        # Process PDF in background using task manager
+        task_manager = BackgroundTaskManager()
+        task_id = task_manager.submit(
+            self._process_pdf,
+            book.id,
+            task_name=f"process_book_{book.id}"
+        )
         
         return Response({
             'book_id': book.id,
+            'task_id': task_id,
             'status': 'processing',
-            'estimated_time': max(30, book.file_size // (1024 * 1024) * 2),  # Rough estimate
+            'estimated_time': max(5, book.file_size // (1024 * 1024)),
             'message': 'فایل با موفقیت آپلود شد و در حال پردازش است.'
-        })
+        }, status=status.HTTP_201_CREATED)
+    
+    @staticmethod
+    def _extract_title(filename: str) -> str:
+        """Extract clean title from filename."""
+        import re
+        # Remove extension
+        title = filename.rsplit('.', 1)[0]
+        # Replace underscores and dashes with spaces
+        title = re.sub(r'[_-]+', ' ', title)
+        # Remove multiple spaces
+        title = re.sub(r'\s+', ' ', title).strip()
+        return title
+    
+    @staticmethod
+    def _process_pdf(book_id: int) -> bool:
+        """Process PDF in background thread."""
+        from pdf_processor.services import PdfProcessorService
+        from core.models import Book
+        
+        try:
+            book = Book.objects.get(id=book_id)
+            processor = PdfProcessorService()
+            return processor.process_book(book)
+        except Book.DoesNotExist:
+            logger.error(f"Book {book_id} not found for processing")
+            return False
+        except Exception as e:
+            logger.exception(f"Background processing failed for book {book_id}: {e}")
+            return False
 
 
 class UploadStatusView(APIView):
@@ -143,6 +195,7 @@ class PageListView(generics.ListAPIView):
     
     serializer_class = BookPageSerializer
     permission_classes = [AllowAny]
+    pagination_class = None  # Return all pages without pagination
 
     def get_queryset(self):
         book_id = self.kwargs.get('book_id')
