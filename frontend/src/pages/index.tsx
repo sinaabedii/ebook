@@ -51,21 +51,21 @@ export default function HomePage() {
       <section className="relative mb-8 sm:mb-12 lg:mb-16">
         <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl card">
           {/* Decorative Elements */}
-          <div className="absolute top-0 left-0 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-primary-500/20 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-40 sm:w-60 lg:w-80 h-40 sm:h-60 lg:h-80 bg-accent-500/15 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px] translate-x-1/3 translate-y-1/3" />
+          <div className="absolute top-0 left-0 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-brand-800/30 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px] -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-40 sm:w-60 lg:w-80 h-40 sm:h-60 lg:h-80 bg-brand-700/20 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px] translate-x-1/3 translate-y-1/3" />
           
           <div className="relative z-10 px-4 sm:px-8 lg:px-16 py-8 sm:py-12 lg:py-20">
             <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
               {/* Content */}
               <div className={`flex-1 text-center ${language === 'fa' ? 'lg:text-right' : 'lg:text-left'}`}>
-                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs sm:text-sm mb-4 sm:mb-6">
+                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-brand-900/20 border border-brand-800/30 text-brand-400 text-xs sm:text-sm mb-4 sm:mb-6">
                   <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{t('home.badge')}</span>
                 </div>
                 
                 <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight" style={{ color: 'var(--text-primary)' }}>
                   {t('home.heroTitle1')}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary-400 to-primary-600"> {t('home.heroTitle2')} </span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-brand-400 to-brand-900"> {t('home.heroTitle2')} </span>
                   {t('home.heroTitle3')}
                 </h1>
                 
@@ -74,7 +74,7 @@ export default function HomePage() {
                 </p>
                 
                 <div className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center ${language === 'fa' ? 'lg:justify-start' : 'lg:justify-start'}`}>
-                  <Link href="/upload" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 transition-all shadow-lg shadow-primary-500/25">
+                  <Link href="/upload" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium rounded-xl text-white transition-all shadow-lg" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
                     <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>{t('home.startButton')}</span>
                   </Link>
@@ -106,11 +106,11 @@ export default function HomePage() {
               
               {/* 3D Book Preview - Only on large screens */}
               <div className="hidden xl:block flex-shrink-0">
-                <div className="relative w-64 h-80 rounded-lg bg-gradient-to-br from-amber-800 to-amber-950 shadow-2xl shadow-black/50 flex items-center justify-center">
+                <div className="relative w-64 h-80 rounded-lg shadow-2xl shadow-black/50 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%)' }}>
                   <div className="text-center p-6">
-                    <BookOpen className="w-14 h-14 text-amber-400 mx-auto mb-4" />
-                    <p className="text-amber-100 font-bold text-lg">{t('common.yourLibrary')}</p>
-                    <p className="text-amber-200/70 text-sm mt-2">{t('common.alwaysAvailable')}</p>
+                    <BookOpen className="w-14 h-14 mx-auto mb-4" style={{ color: '#f27794' }} />
+                    <p className="font-bold text-lg" style={{ color: '#fde6ea' }}>{t('common.yourLibrary')}</p>
+                    <p className="text-sm mt-2" style={{ color: 'rgba(253, 230, 234, 0.7)' }}>{t('common.alwaysAvailable')}</p>
                   </div>
                 </div>
               </div>
@@ -170,7 +170,8 @@ export default function HomePage() {
           
           <Link
             href="/library"
-            className="inline-flex items-center gap-2 text-sm text-primary-400 hover:text-primary-300 transition-colors"
+            className="inline-flex items-center gap-2 text-sm transition-colors"
+            style={{ color: '#f27794' }}
           >
             <span>{t('home.viewAll')}</span>
             <ChevronLeft className={`w-4 h-4 ${language === 'en' ? 'rotate-180' : ''}`} />
@@ -203,7 +204,7 @@ export default function HomePage() {
       {/* CTA Section */}
       {!isAuthenticated && (
         <section className="mb-8">
-          <div className="card p-8 sm:p-12 text-center bg-gradient-to-br from-primary-500/10 to-accent-500/10 border-primary-500/20">
+          <div className="card p-8 sm:p-12 text-center bg-gradient-to-br from-brand-900/20 to-brand-800/10 border-brand-800/30">
             <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               {t('common.startNow')}
             </h3>
@@ -229,7 +230,7 @@ interface FeatureCardProps {
 }
 
 const colorClasses = {
-  primary: 'bg-primary-500/10 text-primary-400 border-primary-500/20',
+  primary: 'bg-brand-900/20 text-brand-400 border-brand-800/30',
   accent: 'bg-accent-500/10 text-accent-400 border-accent-500/20',
   yellow: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
   blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
@@ -305,8 +306,8 @@ function BookCard({ book }: BookCardProps) {
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-900 to-amber-950">
-              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
+              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12" style={{ color: '#f27794' }} />
             </div>
           )}
           
@@ -319,7 +320,7 @@ function BookCard({ book }: BookCardProps) {
           {!book.is_processed && (
             <div className="absolute inset-0 backdrop-blur-sm flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
               <div className="text-center">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-2 sm:mb-3" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-t-transparent rounded-full animate-spin mx-auto mb-2 sm:mb-3" style={{ borderColor: '#5c0025', borderTopColor: 'transparent' }} />
                 <span className="text-xs sm:text-sm text-white">{t('library.processing')}</span>
               </div>
             </div>
@@ -328,7 +329,7 @@ function BookCard({ book }: BookCardProps) {
 
         {/* Info */}
         <div className="p-3 sm:p-4">
-          <h3 className="font-medium sm:font-semibold text-sm sm:text-base mb-1 truncate group-hover:text-primary-400 transition-colors" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="font-medium sm:font-semibold text-sm sm:text-base mb-1 truncate group-hover:text-brand-400 transition-colors" style={{ color: 'var(--text-primary)' }}>
             {book.title}
           </h3>
           <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs" style={{ color: 'var(--text-tertiary)' }}>

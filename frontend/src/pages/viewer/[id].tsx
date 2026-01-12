@@ -94,7 +94,8 @@ export default function ViewerPage() {
           <p className="text-surface-400 mb-6">این کتاب وجود ندارد یا حذف شده است</p>
           <button
             onClick={handleGoBack}
-            className="px-6 py-3 rounded-xl bg-primary-500 text-white font-medium hover:bg-primary-600 transition-colors"
+            className="px-6 py-3 rounded-xl text-white font-medium transition-colors"
+            style={{ backgroundColor: '#5c0025' }}
           >
             بازگشت به کتابخانه
           </button>

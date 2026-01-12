@@ -126,7 +126,7 @@ export default function LibraryPage() {
     <ResponsiveLayout>
       {/* Page Header */}
       <div className="text-center mb-6 sm:mb-8 pt-4">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/25 mb-3 sm:mb-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl shadow-lg mb-3 sm:mb-4" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
           <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </div>
         <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--text-primary)' }}>{t('library.title')}</h1>
@@ -150,7 +150,8 @@ export default function LibraryPage() {
           </div>
           <button
             onClick={handleSearch}
-            className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-primary-500 text-white text-sm font-medium hover:bg-primary-600 transition-colors"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white text-sm font-medium transition-colors"
+            style={{ backgroundColor: '#5c0025' }}
           >
             {t('common.search')}
           </button>
@@ -165,8 +166,10 @@ export default function LibraryPage() {
               <select
                 value={sortField}
                 onChange={(e) => setSortField(e.target.value as SortField)}
-                className="rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none focus:border-primary-500"
+                className="rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm outline-none"
                 style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                onFocus={(e) => { e.target.style.borderColor = '#5c0025'; }}
+                onBlur={(e) => { e.target.style.borderColor = 'var(--border-color)'; }}
               >
                 <option value="created_at">{t('library.newest')}</option>
                 <option value="title">{t('library.nameAZ')}</option>
@@ -195,9 +198,9 @@ export default function LibraryPage() {
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 sm:p-2 rounded-md transition-colors ${
-                viewMode === 'grid' ? 'bg-primary-500/20 text-primary-400' : ''
+                viewMode === 'grid' ? 'text-white' : ''
               }`}
-              style={viewMode !== 'grid' ? { color: 'var(--text-tertiary)' } : {}}
+              style={viewMode === 'grid' ? { backgroundColor: 'rgba(92, 0, 37, 0.3)', color: '#f27794' } : { color: 'var(--text-tertiary)' }}
               title={t('library.gridView')}
             >
               <Grid className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -205,9 +208,9 @@ export default function LibraryPage() {
             <button
               onClick={() => setViewMode('list')}
               className={`p-1.5 sm:p-2 rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-primary-500/20 text-primary-400' : ''
+                viewMode === 'list' ? 'text-white' : ''
               }`}
-              style={viewMode !== 'list' ? { color: 'var(--text-tertiary)' } : {}}
+              style={viewMode === 'list' ? { backgroundColor: 'rgba(92, 0, 37, 0.3)', color: '#f27794' } : { color: 'var(--text-tertiary)' }}
               title={t('library.listView')}
             >
               <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -281,7 +284,8 @@ export default function LibraryPage() {
           </p>
           <Link
             href="/upload"
-            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors text-sm sm:text-base font-medium"
+            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white transition-colors text-sm sm:text-base font-medium"
+            style={{ backgroundColor: '#5c0025' }}
           >
             <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>{t('library.uploadFirst')}</span>
@@ -314,8 +318,8 @@ function GridBookCard({ book, onDelete }: BookCardProps) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-900 to-amber-950">
-              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-amber-400" />
+            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
+              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12" style={{ color: '#f27794' }} />
             </div>
           )}
 
@@ -327,7 +331,7 @@ function GridBookCard({ book, onDelete }: BookCardProps) {
 
         {/* Info */}
         <div className="p-3 sm:p-4">
-          <h3 className="font-medium sm:font-semibold text-sm sm:text-base truncate group-hover:text-primary-400 transition-colors" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="font-medium sm:font-semibold text-sm sm:text-base truncate transition-colors" style={{ color: 'var(--text-primary)' }}>
             {book.title}
           </h3>
           {book.description && (
@@ -390,8 +394,8 @@ function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-900 to-amber-950">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-amber-400" />
+            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#f27794' }} />
             </div>
           )}
         </div>
@@ -399,7 +403,7 @@ function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
 
       <div className="flex-1 min-w-0">
         <Link href={`/viewer/${book.id}`}>
-          <h3 className="font-medium sm:font-semibold text-sm sm:text-base hover:text-primary-400 transition-colors truncate" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="font-medium sm:font-semibold text-sm sm:text-base transition-colors truncate" style={{ color: 'var(--text-primary)' }}>
             {book.title}
           </h3>
         </Link>

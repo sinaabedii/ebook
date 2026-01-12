@@ -403,8 +403,8 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
         ) : (
           <div className="w-full h-full flex items-center justify-center relative z-10">
             <div className="text-center">
-              <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-amber-300/50 mx-auto" />
-              <p className="text-amber-400/40 text-sm mt-2">صفحه {pageNum}</p>
+              <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" style={{ color: 'rgba(242, 119, 148, 0.5)' }} />
+              <p className="text-sm mt-2" style={{ color: 'rgba(242, 119, 148, 0.4)' }}>صفحه {pageNum}</p>
             </div>
           </div>
         )}
@@ -936,7 +936,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
 
       {/* Bottom Left Logo */}
       <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 flex items-center gap-2" onMouseDown={e => e.stopPropagation()}>
-        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary-500 flex items-center justify-center">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#5c0025' }}>
           <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
         <span className="text-gray-600 font-medium text-sm sm:text-base hidden sm:block">
@@ -973,7 +973,10 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
             }
             e.stopPropagation();
           }}
-          className="w-12 sm:w-14 px-2 py-1 text-center text-gray-800 font-bold bg-white/80 rounded-lg border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none text-sm sm:text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-12 sm:w-14 px-2 py-1 text-center text-gray-800 font-bold bg-white/80 rounded-lg border border-gray-300 outline-none text-sm sm:text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          style={{ borderColor: 'var(--border-color)' }}
+          onFocus={(e) => { e.target.style.borderColor = '#5c0025'; e.target.style.boxShadow = '0 0 0 3px rgba(92, 0, 37, 0.2)'; }}
+          onBlur={(e) => { e.target.style.borderColor = '#d1d5db'; e.target.style.boxShadow = 'none'; }}
         />
         <span className="text-gray-500 text-xs sm:text-sm">از</span>
         <span className="text-gray-600 font-medium text-sm sm:text-base">{totalPages}</span>

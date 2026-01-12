@@ -117,7 +117,7 @@ export default function UploadPage() {
       <div className="max-w-2xl mx-auto pt-4">
         {/* Page Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/25 mb-3 sm:mb-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl shadow-lg mb-3 sm:mb-4" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
             <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
           <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--text-primary)' }}>{t('upload.title')}</h1>
@@ -132,14 +132,14 @@ export default function UploadPage() {
             isActive={step === 'select'} 
             isCompleted={['metadata', 'uploading', 'processing', 'complete'].includes(step)} 
           />
-          <div className={`w-6 sm:w-12 h-0.5 mx-1 sm:mx-2 transition-colors ${['metadata', 'uploading', 'processing', 'complete'].includes(step) ? 'bg-primary-500' : ''}`} style={{ backgroundColor: !['metadata', 'uploading', 'processing', 'complete'].includes(step) ? 'var(--border-color)' : undefined }} />
+          <div className={`w-6 sm:w-12 h-0.5 mx-1 sm:mx-2 transition-colors ${['metadata', 'uploading', 'processing', 'complete'].includes(step) ? '' : ''}`} style={{ backgroundColor: ['metadata', 'uploading', 'processing', 'complete'].includes(step) ? '#5c0025' : 'var(--border-color)' }} />
           <StepIndicator 
             step={2} 
             label={t('upload.step2')} 
             isActive={step === 'metadata'} 
             isCompleted={['uploading', 'processing', 'complete'].includes(step)} 
           />
-          <div className={`w-6 sm:w-12 h-0.5 mx-1 sm:mx-2 transition-colors ${['uploading', 'processing', 'complete'].includes(step) ? 'bg-primary-500' : ''}`} style={{ backgroundColor: !['uploading', 'processing', 'complete'].includes(step) ? 'var(--border-color)' : undefined }} />
+          <div className={`w-6 sm:w-12 h-0.5 mx-1 sm:mx-2 transition-colors`} style={{ backgroundColor: ['uploading', 'processing', 'complete'].includes(step) ? '#5c0025' : 'var(--border-color)' }} />
           <StepIndicator 
             step={3} 
             label={t('upload.step3')} 
@@ -176,8 +176,8 @@ export default function UploadPage() {
 
               {/* File Preview */}
               <div className="flex items-center gap-4 p-4 rounded-xl mb-6" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)' }}>
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 border border-primary-500/20">
-                  <FileText className="w-7 h-7 text-primary-400" />
+                <div className="p-3 rounded-xl border" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))', borderColor: 'rgba(92, 0, 37, 0.3)' }}>
+                  <FileText className="w-7 h-7" style={{ color: '#f27794' }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate" style={{ color: 'var(--text-primary)' }}>{selectedFile.name}</p>
@@ -244,9 +244,9 @@ export default function UploadPage() {
             <div className="text-center py-12">
               <div className="w-20 h-20 mx-auto mb-6 relative">
                 <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--border-color)' }} />
-                <div className="absolute inset-0 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+                <div className="absolute inset-0 rounded-full border-4 border-t-transparent animate-spin" style={{ borderColor: '#5c0025', borderTopColor: 'transparent' }} />
                 <div className="absolute inset-2 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
-                  <span className="text-xl font-bold text-primary-400">{uploadProgress}%</span>
+                  <span className="text-xl font-bold" style={{ color: '#f27794' }}>{uploadProgress}%</span>
                 </div>
               </div>
               <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
@@ -349,9 +349,11 @@ function StepIndicator({ step, label, isActive, isCompleted }: StepIndicatorProp
         w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-semibold text-xs sm:text-sm
         transition-all duration-300 border-2
         ${isCompleted ? 'bg-accent-500 border-accent-500 text-white shadow-lg shadow-accent-500/25' : ''}
-        ${isActive ? 'bg-primary-500 border-primary-500 text-white shadow-lg shadow-primary-500/25' : ''}
+        ${isActive ? 'text-white shadow-lg' : ''}
         ${!isActive && !isCompleted ? 'bg-surface-800 border-surface-700 text-surface-500' : ''}
-      `}>
+      `}
+      style={isActive ? { backgroundColor: '#5c0025', borderColor: '#5c0025', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' } : {}}
+      >
         {isCompleted ? (
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
         ) : (
@@ -361,9 +363,10 @@ function StepIndicator({ step, label, isActive, isCompleted }: StepIndicatorProp
       <span className={`
         text-[10px] sm:text-xs mt-1.5 sm:mt-2 font-medium transition-colors
         ${isCompleted ? 'text-accent-400' : ''}
-        ${isActive ? 'text-primary-400' : ''}
         ${!isActive && !isCompleted ? 'text-surface-500' : ''}
-      `}>
+      `}
+      style={isActive ? { color: '#f27794' } : {}}
+      >
         {label}
       </span>
     </div>

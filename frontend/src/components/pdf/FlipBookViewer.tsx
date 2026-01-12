@@ -186,8 +186,8 @@ export const FlipBookViewer: React.FC<FlipBookViewerProps> = ({
           <div className="mt-4 w-48">
             <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-primary-500 transition-all duration-300"
-                style={{ width: `${progress}%` }}
+                className="h-full transition-all duration-300"
+                style={{ width: `${progress}%`, backgroundColor: '#5c0025' }}
               />
             </div>
             <p className="text-sm text-slate-400 text-center mt-2">

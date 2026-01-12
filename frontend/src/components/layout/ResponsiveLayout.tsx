@@ -110,7 +110,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
               )}
 
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-shadow" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
                 {!isMobile && (
@@ -145,9 +145,9 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                       key={item.href}
                       href={item.href}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        isActive ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25' : ''
+                        isActive ? 'text-white shadow-lg' : ''
                       }`}
-                      style={!isActive ? { color: 'var(--text-secondary)' } : {}}
+                      style={isActive ? { backgroundColor: '#5c0025', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' } : { color: 'var(--text-secondary)' }}
                     >
                       <Icon className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -174,11 +174,11 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                     className="flex items-center gap-2 p-1.5 rounded-xl transition-colors hover:opacity-80"
                     style={{ backgroundColor: 'var(--bg-tertiary)' }}
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500/20 to-primary-600/20 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))' }}>
                       {user.avatar ? (
                         <img src={user.avatar} alt="" className="w-full h-full rounded-lg object-cover" />
                       ) : (
-                        <User className="w-4 h-4 text-primary-400" />
+                        <User className="w-4 h-4" style={{ color: '#f27794' }} />
                       )}
                     </div>
                     {!isMobile && (
@@ -245,7 +245,8 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
               ) : (
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl text-white transition-colors"
+                  style={{ backgroundColor: '#5c0025' }}
                 >
                   <User className="w-4 h-4" />
                   <span>{t('nav.login')}</span>
@@ -278,9 +279,9 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      isActive ? 'bg-primary-500 text-white' : ''
+                      isActive ? 'text-white' : ''
                     }`}
-                    style={!isActive ? { color: 'var(--text-secondary)' } : {}}
+                    style={isActive ? { backgroundColor: '#5c0025' } : { color: 'var(--text-secondary)' }}
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.label}</span>
@@ -303,7 +304,7 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)' }}>
                   <BookOpen className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
@@ -340,12 +341,10 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all ${
-                    isActive ? 'text-primary-400' : ''
-                  }`}
-                  style={!isActive ? { color: 'var(--text-tertiary)' } : {}}
+                  className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all`}
+                  style={isActive ? { color: '#f27794' } : { color: 'var(--text-tertiary)' }}
                 >
-                  <div className={`p-2 rounded-xl transition-all ${isActive ? 'bg-primary-500/20' : ''}`}>
+                  <div className={`p-2 rounded-xl transition-all`} style={isActive ? { backgroundColor: 'rgba(92, 0, 37, 0.2)' } : {}}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <span className="text-[10px] font-medium">{item.label}</span>

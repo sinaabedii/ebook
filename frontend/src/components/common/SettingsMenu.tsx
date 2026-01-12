@@ -59,8 +59,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-2.5 rounded-xl transition-all duration-200 ${
-          isOpen ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25' : 'btn-icon'
+          isOpen ? 'text-white shadow-lg' : 'btn-icon'
         }`}
+        style={isOpen ? { backgroundColor: '#5c0025', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' } : {}}
         aria-label={t('common.settings')}
         title={t('common.settings')}
       >
@@ -106,9 +107,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
                 <button
                   onClick={() => !isDark || toggleTheme()}
                   className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
-                    !isDark ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                    !isDark ? 'font-medium' : ''
                   }`}
-                  style={isDark ? { color: 'var(--text-secondary)' } : {}}
+                  style={!isDark ? { backgroundColor: 'rgba(92, 0, 37, 0.2)', color: '#f27794' } : { color: 'var(--text-secondary)' }}
                 >
                   <Sun className="w-4 h-4" />
                   <span className="text-sm">{t('common.lightMode')}</span>
@@ -117,9 +118,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
                 <button
                   onClick={() => isDark || toggleTheme()}
                   className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
-                    isDark ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                    isDark ? 'font-medium' : ''
                   }`}
-                  style={!isDark ? { color: 'var(--text-secondary)' } : {}}
+                  style={isDark ? { backgroundColor: 'rgba(92, 0, 37, 0.2)', color: '#f27794' } : { color: 'var(--text-secondary)' }}
                 >
                   <Moon className="w-4 h-4" />
                   <span className="text-sm">{t('common.darkMode')}</span>
@@ -140,9 +141,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
                 <button
                   onClick={() => language !== 'fa' && toggleLanguage()}
                   className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
-                    language === 'fa' ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                    language === 'fa' ? 'font-medium' : ''
                   }`}
-                  style={language !== 'fa' ? { color: 'var(--text-secondary)' } : {}}
+                  style={language === 'fa' ? { backgroundColor: 'rgba(92, 0, 37, 0.2)', color: '#f27794' } : { color: 'var(--text-secondary)' }}
                 >
                   <span className="text-sm">🇮🇷</span>
                   <span className="text-sm">{t('common.persian')}</span>
@@ -151,9 +152,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
                 <button
                   onClick={() => language !== 'en' && toggleLanguage()}
                   className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
-                    language === 'en' ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                    language === 'en' ? 'font-medium' : ''
                   }`}
-                  style={language !== 'en' ? { color: 'var(--text-secondary)' } : {}}
+                  style={language === 'en' ? { backgroundColor: 'rgba(92, 0, 37, 0.2)', color: '#f27794' } : { color: 'var(--text-secondary)' }}
                 >
                   <span className="text-sm">🇺🇸</span>
                   <span className="text-sm">{t('common.english')}</span>

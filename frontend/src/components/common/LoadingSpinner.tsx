@@ -53,7 +53,8 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       <div className="relative">
         <div className={`${sizeClasses[size]} rounded-full border-4 border-slate-700 animate-pulse`} />
         <div
-          className={`${sizeClasses[size]} absolute top-0 left-0 rounded-full border-4 border-transparent border-t-primary-500 animate-spin`}
+          className={`${sizeClasses[size]} absolute top-0 left-0 rounded-full border-4 border-transparent animate-spin`}
+          style={{ borderTopColor: '#5c0025' }}
         />
       </div>
       {text && <span className="text-sm text-slate-400 animate-pulse">{text}</span>}
@@ -70,25 +71,25 @@ export const BookLoadingSpinner: React.FC<SkeletonProps> = ({ className = '' }) 
     <div className={`flex flex-col items-center justify-center gap-4 ${className}`}>
       <div className="relative w-16 h-20">
         {/* Book shape */}
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-800 to-amber-900 rounded-r-md shadow-lg">
+        <div className="absolute inset-0 rounded-r-md shadow-lg" style={{ background: 'linear-gradient(90deg, #5c0025, #3d0018)' }}>
           {/* Spine */}
-          <div className="absolute left-0 top-0 bottom-0 w-2 bg-amber-950 rounded-l-sm" />
+          <div className="absolute left-0 top-0 bottom-0 w-2 rounded-l-sm" style={{ backgroundColor: '#3d0018' }} />
           {/* Pages animation */}
-          <div className="absolute right-1 top-1 bottom-1 left-3 bg-amber-50 rounded-r-sm overflow-hidden">
+          <div className="absolute right-1 top-1 bottom-1 left-3 rounded-r-sm overflow-hidden" style={{ backgroundColor: '#fef1f3' }}>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-300/50 to-transparent animate-pulse" />
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="h-1 mx-1 my-2 bg-slate-300/50 rounded animate-pulse"
-                style={{ animationDelay: `${i * 0.1}s` }}
+                className="h-1 mx-1 my-2 rounded animate-pulse"
+                style={{ animationDelay: `${i * 0.1}s`, backgroundColor: 'rgba(92, 0, 37, 0.2)' }}
               />
             ))}
           </div>
         </div>
         {/* Floating page */}
         <div
-          className="absolute right-0 top-0 w-10 h-14 bg-amber-50 rounded-sm shadow-md animate-float origin-left"
-          style={{ animationDuration: '1.5s' }}
+          className="absolute right-0 top-0 w-10 h-14 rounded-sm shadow-md animate-float origin-left"
+          style={{ animationDuration: '1.5s', backgroundColor: '#fef1f3' }}
         />
       </div>
       <span className="text-slate-400 text-sm animate-pulse">در حال بارگذاری کتاب...</span>

@@ -10,18 +10,36 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Premium Color Palette
+        // Premium Color Palette - Corporate Brand #5c0025
         primary: {
-          50: '#fef7ec',
-          100: '#fceacc',
-          200: '#f9d394',
-          300: '#f5b54c',
-          400: '#f29d24',
-          500: '#e67e0b',
-          600: '#cb5e06',
-          700: '#a84209',
-          800: '#89350f',
-          900: '#712e10',
+          50: '#fef1f3',
+          100: '#fde6ea',
+          200: '#fbd0d9',
+          300: '#f8a9ba',
+          400: '#f27794',
+          500: '#5c0025',  // Main brand color
+          600: '#520021',
+          700: '#47001d',
+          800: '#3d0018',
+          900: '#330014',
+          950: '#290010',
+        },
+        // Brand accent shades for hover/active states
+        brand: {
+          light: '#8a1945',
+          DEFAULT: '#5c0025',
+          dark: '#3d0018',
+          50: '#fef1f3',
+          100: '#fde6ea',
+          200: '#fbd0d9',
+          300: '#f8a9ba',
+          400: '#f27794',
+          500: '#e84d6e',
+          600: '#d42a52',
+          700: '#b21e42',
+          800: '#8a1945',
+          900: '#5c0025',
+          950: '#3d0018',
         },
         accent: {
           50: '#f0fdf4',
@@ -49,13 +67,13 @@ const config: Config = {
           950: '#09090b',
         },
         book: {
-          cover: '#5D4037',
-          coverLight: '#8D6E63',
-          coverDark: '#3E2723',
+          cover: '#5c0025',
+          coverLight: '#8a1945',
+          coverDark: '#3d0018',
           page: '#FFFEF7',
           pageShadow: '#F5F0E6',
-          spine: '#4E342E',
-          gold: '#D4AF37',
+          spine: '#3d0018',
+          gold: '#f27794',
         },
       },
       fontFamily: {

@@ -202,7 +202,7 @@ const PageThumbnailComponent: React.FC<PageThumbnailProps> = ({
       )}
 
       {/* Active indicator */}
-      {isActive && <div className="absolute inset-0 border-2 border-primary-400 rounded-md" />}
+      {isActive && <div className="absolute inset-0 rounded-md" style={{ border: '2px solid #f27794' }} />}
     </button>
   );
 };

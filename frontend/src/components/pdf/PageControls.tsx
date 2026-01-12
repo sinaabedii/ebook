@@ -172,7 +172,8 @@ export const PageControls: React.FC<PageControlsProps> = ({
         {/* Page mode toggle */}
         <button
           onClick={togglePageMode}
-          className={`control-btn ${settings.pageMode === 'double' ? 'bg-primary-500/20' : ''}`}
+          className={`control-btn ${settings.pageMode === 'double' ? '' : ''}`}
+          style={settings.pageMode === 'double' ? { backgroundColor: 'rgba(92, 0, 37, 0.2)' } : {}}
           aria-label="تغییر حالت نمایش"
           title={settings.pageMode === 'single' ? 'نمایش دو صفحه' : 'نمایش تک صفحه'}
         >
@@ -196,7 +197,8 @@ export const PageControls: React.FC<PageControlsProps> = ({
         {/* Settings */}
         <button
           onClick={() => onSettingsChange({ showThumbnails: !settings.showThumbnails })}
-          className={`control-btn ${settings.showThumbnails ? 'bg-primary-500/20' : ''}`}
+          className={`control-btn ${settings.showThumbnails ? '' : ''}`}
+          style={settings.showThumbnails ? { backgroundColor: 'rgba(92, 0, 37, 0.2)' } : {}}
           aria-label="تنظیمات"
           title="تنظیمات"
         >

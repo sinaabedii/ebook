@@ -38,15 +38,15 @@ export default function Header() {
   ];
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50" dir="rtl">
+    <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--bg-card)', borderBottom: '1px solid var(--border-color)' }} dir="rtl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#5c0025' }}>
               <BookOpen className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">
+            <span className="text-xl font-bold hidden sm:block" style={{ color: 'var(--text-primary)' }}>
               ArianDoc
             </span>
           </Link>
@@ -60,11 +60,11 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={isActive 
+                    ? { backgroundColor: 'rgba(92, 0, 37, 0.15)', color: '#f27794' }
+                    : { color: 'var(--text-secondary)' }
+                  }
                 >
                   <Icon className="w-4 h-4" />
                   {link.label}
@@ -76,46 +76,48 @@ export default function Header() {
           {/* User Section */}
           <div className="flex items-center gap-4">
             {isLoading ? (
-              <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+              <div className="w-8 h-8 rounded-full animate-pulse" style={{ backgroundColor: 'var(--bg-tertiary)' }} />
             ) : isAuthenticated && user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+                  style={{ backgroundColor: 'transparent' }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(92, 0, 37, 0.15)' }}>
                     {user.avatar ? (
                       <img src={user.avatar} alt="" className="w-full h-full rounded-full object-cover" />
                     ) : (
-                      <User className="w-4 h-4 text-indigo-600" />
+                      <User className="w-4 h-4" style={{ color: '#5c0025' }} />
                     )}
                   </div>
                   <div className="hidden sm:block text-right">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       {user.full_name || user.first_name || user.phone}
                     </p>
                     {user.organization_name && (
-                      <p className="text-xs text-gray-500">{user.organization_name}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{user.organization_name}</p>
                     )}
                   </div>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} style={{ color: 'var(--text-tertiary)' }} />
                 </button>
 
                 {/* User Dropdown Menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                    <div className="px-4 py-3 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">
+                  <div className="absolute left-0 mt-2 w-56 rounded-lg shadow-lg py-1 z-50" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+                    <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                         {user.full_name || user.first_name || 'کاربر'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-0.5 ltr" dir="ltr">
+                      <p className="text-xs mt-0.5 ltr" dir="ltr" style={{ color: 'var(--text-tertiary)' }}>
                         {user.phone}
                       </p>
                     </div>
                     
                     <Link
                       href="/profile"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <User className="w-4 h-4" />
@@ -124,18 +126,19 @@ export default function Header() {
                     
                     <Link
                       href="/settings"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <Settings className="w-4 h-4" />
                       تنظیمات
                     </Link>
                     
-                    <hr className="my-1" />
+                    <hr style={{ borderColor: 'var(--border-color)', margin: '4px 0' }} />
                     
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 w-full"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 w-full transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
                       خروج
@@ -146,7 +149,8 @@ export default function Header() {
             ) : (
               <Link
                 href="/auth/login"
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors"
+                style={{ backgroundColor: '#5c0025' }}
               >
                 <User className="w-4 h-4" />
                 <span className="hidden sm:inline">ورود / ثبت‌نام</span>
@@ -157,7 +161,8 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-50"
+              className="md:hidden p-2 rounded-lg"
+              style={{ color: 'var(--text-primary)' }}
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -166,7 +171,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-100">
+          <nav className="md:hidden py-4" style={{ borderTop: '1px solid var(--border-color)' }}>
             {navLinks.map(link => {
               const Icon = link.icon;
               const isActive = router.pathname === link.href;
@@ -174,11 +179,11 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium"
+                  style={isActive 
+                    ? { backgroundColor: 'rgba(92, 0, 37, 0.15)', color: '#f27794' }
+                    : { color: 'var(--text-secondary)' }
+                  }
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Icon className="w-5 h-5" />

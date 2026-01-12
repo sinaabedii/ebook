@@ -202,15 +202,15 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-8" dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor: 'var(--bg-primary)' }}>
         {/* Background Effects */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-1/4 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-primary-500/10 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-40 sm:w-60 lg:w-80 h-40 sm:h-60 lg:h-80 bg-accent-500/10 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px]" />
+          <div className="absolute top-0 left-1/4 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px]" style={{ backgroundColor: 'rgba(92, 0, 37, 0.15)' }} />
+          <div className="absolute bottom-0 right-1/4 w-40 sm:w-60 lg:w-80 h-40 sm:h-60 lg:h-80 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px]" style={{ backgroundColor: 'rgba(92, 0, 37, 0.1)' }} />
         </div>
 
         <div className="w-full max-w-sm sm:max-w-md relative z-10">
           {/* Logo/Header */}
           <div className="text-center mb-6 sm:mb-8">
             <Link href="/" className="inline-block">
-              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 text-white mb-3 sm:mb-4 shadow-lg shadow-primary-500/25">
+              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl text-white mb-3 sm:mb-4 shadow-lg" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
                 <BookOpen className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
             </Link>
@@ -306,7 +306,10 @@ export default function LoginPage() {
                         onChange={e => handleOtpChange(index, e.target.value)}
                         onKeyDown={e => handleOtpKeyDown(index, e)}
                         onPaste={handleOtpPaste}
-                        className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-surface-800 border-2 border-surface-700 rounded-lg sm:rounded-xl text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                        className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-surface-800 border-2 border-surface-700 rounded-lg sm:rounded-xl text-white outline-none transition-all"
+                        style={{ borderColor: 'var(--border-color)' }}
+                        onFocus={(e) => { e.target.style.borderColor = '#5c0025'; e.target.style.boxShadow = '0 0 0 3px rgba(92, 0, 37, 0.2)'; }}
+                        onBlur={(e) => { e.target.style.borderColor = 'var(--border-color)'; e.target.style.boxShadow = 'none'; }}
                       />
                     ))}
                   </div>
@@ -336,7 +339,8 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={handleResendOtp}
-                      className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
+                      className="text-sm transition-colors"
+                      style={{ color: '#f27794' }}
                     >
                       ارسال مجدد کد
                     </button>
@@ -429,7 +433,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="text-center text-sm text-surface-500 mt-6">
-            با ورود به سامانه، <Link href="/terms" className="text-primary-400 hover:text-primary-300 transition-colors">قوانین و مقررات</Link> را می‌پذیرید
+            با ورود به سامانه، <Link href="/terms" className="transition-colors" style={{ color: '#f27794' }}>قوانین و مقررات</Link> را می‌پذیرید
           </p>
         </div>
       </div>

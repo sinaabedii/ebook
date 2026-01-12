@@ -103,10 +103,11 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({ onUpload, maxSize = 50
           <div className="flex flex-col items-center gap-4">
             <div
               className={`p-4 rounded-full transition-all duration-300 ${
-                isDragActive ? 'bg-primary-500/20 scale-110' : 'bg-slate-700/50'
+                isDragActive ? 'scale-110' : ''
               }`}
+              style={{ backgroundColor: isDragActive ? 'rgba(92, 0, 37, 0.2)' : 'rgba(100, 116, 139, 0.3)' }}
             >
-              <Upload className={`w-10 h-10 ${isDragActive ? 'text-primary-400' : 'text-slate-400'}`} />
+              <Upload className="w-10 h-10" style={{ color: isDragActive ? '#f27794' : '#94a3b8' }} />
             </div>
 
             <div>
@@ -124,8 +125,8 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({ onUpload, maxSize = 50
       {uploadStatus === 'uploading' && selectedFile && (
         <div className="glass p-6 rounded-xl">
           <div className="flex items-start gap-4 mb-4">
-            <div className="p-3 rounded-lg bg-primary-500/20">
-              <FileText className="w-8 h-8 text-primary-400" />
+            <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(92, 0, 37, 0.2)' }}>
+              <FileText className="w-8 h-8" style={{ color: '#f27794' }} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white font-medium truncate">{selectedFile.name}</p>

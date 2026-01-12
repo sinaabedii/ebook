@@ -8,6 +8,16 @@
 /* ==================== Custom Properties ==================== */
 @layer base {
   :root {
+    /* Corporate Brand Color */
+    --brand-primary: #5c0025;
+    --brand-light: #8a1945;
+    --brand-dark: #3d0018;
+    --brand-50: #fef1f3;
+    --brand-100: #fde6ea;
+    --brand-200: #fbd0d9;
+    --brand-300: #f8a9ba;
+    --brand-400: #f27794;
+    
     /* Default is Dark Mode (since the app was built with dark first) */
     --bg-primary: #09090b;
     --bg-secondary: #18181b;
@@ -18,14 +28,14 @@
     --text-tertiary: #71717a;
     --border-color: #27272a;
     
-    /* Book Variables */
-    --book-cover: #5D4037;
-    --book-cover-light: #8D6E63;
-    --book-cover-dark: #3E2723;
+    /* Book Variables - Updated with brand colors */
+    --book-cover: #5c0025;
+    --book-cover-light: #8a1945;
+    --book-cover-dark: #3d0018;
     --book-page: #FFFEF7;
     --book-page-shadow: #F5F0E6;
-    --book-spine: #4E342E;
-    --book-gold: #D4AF37;
+    --book-spine: #3d0018;
+    --book-gold: #f27794;
     --flip-duration: 0.6s;
     
     /* Shadows */
@@ -78,20 +88,20 @@
   /* Dark mode body gradient */
   html.dark body {
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(230, 126, 11, 0.15), transparent),
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(92, 0, 37, 0.15), transparent),
       radial-gradient(ellipse 60% 40% at 100% 100%, rgba(34, 197, 94, 0.08), transparent);
   }
 
   /* Light mode body gradient */
   html:not(.dark) body {
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(230, 126, 11, 0.06), transparent),
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(92, 0, 37, 0.06), transparent),
       radial-gradient(ellipse 60% 40% at 100% 100%, rgba(34, 197, 94, 0.04), transparent);
   }
 
   /* Selection */
   ::selection {
-    @apply bg-primary-500/30;
+    background-color: rgba(92, 0, 37, 0.3);
   }
   
   html.dark ::selection {
@@ -110,9 +120,20 @@
   }
   
   .btn-primary {
-    @apply btn bg-gradient-to-r from-primary-500 to-primary-600 text-white
-           hover:from-primary-600 hover:to-primary-700 
-           focus:ring-primary-500 shadow-lg shadow-primary-500/25;
+    @apply btn text-white shadow-lg;
+    background: linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%);
+    box-shadow: 0 4px 15px rgba(92, 0, 37, 0.4);
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #a91a4a 0%, #5c0025 50%, #47001d 100%);
+    box-shadow: 0 6px 20px rgba(92, 0, 37, 0.5);
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary:focus {
+    @apply ring-2 ring-offset-2;
+    --tw-ring-color: #5c0025;
   }
   
   .btn-secondary {
@@ -161,8 +182,12 @@
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     @apply w-full px-4 py-3 rounded-xl
-           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 
            focus:outline-none transition-all duration-200;
+  }
+  
+  .input:focus {
+    border-color: #5c0025;
+    box-shadow: 0 0 0 3px rgba(92, 0, 37, 0.15);
   }
   
   .input::placeholder {
@@ -298,12 +323,18 @@
   /* ===== Upload Zone ===== */
   .upload-zone {
     @apply relative border-2 border-dashed border-surface-700 rounded-2xl 
-           p-12 text-center cursor-pointer transition-all duration-300
-           hover:border-primary-500/50 hover:bg-primary-500/5;
+           p-12 text-center cursor-pointer transition-all duration-300;
+  }
+  
+  .upload-zone:hover {
+    border-color: rgba(92, 0, 37, 0.5);
+    background-color: rgba(92, 0, 37, 0.05);
   }
   
   .upload-zone.dragging {
-    @apply border-primary-500 bg-primary-500/10 scale-[1.02];
+    border-color: #5c0025;
+    background-color: rgba(92, 0, 37, 0.1);
+    @apply scale-[1.02];
   }
 
   /* ===== Progress Bar ===== */
@@ -313,7 +344,7 @@
   
   .progress-fill {
     @apply h-full rounded-full transition-all duration-500 ease-out;
-    background: linear-gradient(90deg, #e67e0b, #f29d24, #22c55e);
+    background: linear-gradient(90deg, #3d0018, #5c0025, #8a1945);
   }
 
   /* ===== Thumbnail Grid ===== */
@@ -325,11 +356,16 @@
   .thumbnail-item {
     @apply relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer
            border-2 border-transparent transition-all duration-200
-           hover:scale-105 hover:border-primary-500/50;
+           hover:scale-105;
+  }
+  
+  .thumbnail-item:hover {
+    border-color: rgba(92, 0, 37, 0.5);
   }
   
   .thumbnail-item.active {
-    @apply border-primary-500 ring-2 ring-primary-500/30;
+    border-color: #5c0025;
+    box-shadow: 0 0 0 3px rgba(92, 0, 37, 0.3);
   }
 
   /* ===== Skeleton Loading ===== */
@@ -350,7 +386,9 @@
   }
   
   .badge-primary {
-    @apply badge bg-primary-500/20 text-primary-400;
+    @apply badge;
+    background-color: rgba(92, 0, 37, 0.2);
+    color: #f27794;
   }
   
   .badge-success {
@@ -388,7 +426,7 @@
   .presentation-mode {
     @apply fixed inset-0 z-[100] bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950;
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(230, 126, 11, 0.08), transparent),
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(92, 0, 37, 0.08), transparent),
       radial-gradient(ellipse 60% 40% at 100% 100%, rgba(34, 197, 94, 0.05), transparent);
   }
   
@@ -428,8 +466,8 @@
   }
   
   .book-spine {
-    @apply absolute top-0 bottom-0 w-6 sm:w-8
-           bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900;
+    @apply absolute top-0 bottom-0 w-6 sm:w-8;
+    background: linear-gradient(90deg, #3d0018, #5c0025, #3d0018);
     left: 50%;
     transform: translateX(-50%) rotateY(90deg) translateZ(3px);
     box-shadow: 
@@ -578,10 +616,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(230, 126, 11, 0.3);
+    box-shadow: 0 0 20px rgba(92, 0, 37, 0.3);
   }
   50% {
-    box-shadow: 0 0 40px rgba(230, 126, 11, 0.5);
+    box-shadow: 0 0 40px rgba(92, 0, 37, 0.5);
   }
 }
 

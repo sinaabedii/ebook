@@ -96,7 +96,7 @@ export default function ProfilePage() {
     return (
       <ResponsiveLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#5c0025' }} />
         </div>
       </ResponsiveLayout>
     );
@@ -115,11 +115,11 @@ export default function ProfilePage() {
           {/* Header Card */}
           <div className="card p-6 mb-6">
             <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 border border-primary-500/30 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-2xl border flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))', borderColor: 'rgba(92, 0, 37, 0.3)' }}>
                 {user.avatar ? (
                   <img src={user.avatar} alt="" className="w-full h-full rounded-2xl object-cover" />
                 ) : (
-                  <User className="w-10 h-10 text-primary-400" />
+                  <User className="w-10 h-10" style={{ color: '#f27794' }} />
                 )}
               </div>
               <div className="flex-1">
