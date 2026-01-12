@@ -1,8 +1,8 @@
 """
 Custom exceptions for the E-Book Platform.
 """
-from rest_framework.exceptions import APIException
 from rest_framework import status
+from rest_framework.exceptions import APIException
 
 
 class BookNotFoundError(APIException):

@@ -2,48 +2,68 @@
 Django settings for ArianDoc project.
 سامانه مدیریت اسناد دیجیتال هلدینگ آرین سعید
 """
-
 import os
 from pathlib import Path
+from typing import List
+
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# =============================================================================
+# Core Settings
+# =============================================================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-change-this-in-production')
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-change-this-in-production'
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS: List[str] = os.getenv(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1'
+).split(',')
 
-# Application definition
-INSTALLED_APPS = [
+ROOT_URLCONF = 'flipbook_backend.urls'
+WSGI_APPLICATION = 'flipbook_backend.wsgi.application'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# =============================================================================
+# Application Definition
+# =============================================================================
+
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Third party
+]
+
+THIRD_PARTY_APPS = [
     'rest_framework',
     'corsheaders',
     'django_filters',
     'drf_yasg',
-    
-    # Local apps
+]
+
+LOCAL_APPS = [
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
     'pdf_processor.apps.PdfProcessorConfig',
 ]
 
-# Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# =============================================================================
+# Middleware
+# =============================================================================
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +77,22 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'flipbook_backend.urls'
+# =============================================================================
+# Authentication
+# =============================================================================
+
+AUTH_USER_MODEL = 'accounts.User'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# =============================================================================
+# Templates
+# =============================================================================
 
 TEMPLATES = [
     {
@@ -75,9 +110,10 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'flipbook_backend.wsgi.application'
-
+# =============================================================================
 # Database
+# =============================================================================
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
@@ -89,33 +125,30 @@ DATABASES = {
     }
 }
 
-# Password validation
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
+# =============================================================================
 # Internationalization
+# =============================================================================
+
 LANGUAGE_CODE = 'fa'
 TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# =============================================================================
+# Static & Media Files
+# =============================================================================
+
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# =============================================================================
+# REST Framework
+# =============================================================================
 
-# REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -133,13 +166,19 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS settings
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all origins in development
-CORS_ALLOWED_ORIGINS = os.getenv(
+# =============================================================================
+# CORS Settings
+# =============================================================================
+
+CORS_ALLOW_ALL_ORIGINS = DEBUG
+
+CORS_ALLOWED_ORIGINS: List[str] = os.getenv(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:3000,http://localhost:3004,http://127.0.0.1:3000,http://127.0.0.1:3004'
 ).split(',')
+
 CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -152,11 +191,19 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-# File upload settings
-FILE_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 500MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 500MB
+# =============================================================================
+# File Upload Settings
+# =============================================================================
 
+# 500MB limit
+MAX_UPLOAD_SIZE_MB = 500
+FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE_MB * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
+# =============================================================================
 # Celery Configuration
+# =============================================================================
+
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
@@ -164,9 +211,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# PDF Processing settings
+# =============================================================================
+# PDF Processing Settings
+# =============================================================================
+
 PDF_PROCESSING = {
-    'MAX_FILE_SIZE': 500 * 1024 * 1024,  # 500MB
+    'MAX_FILE_SIZE': MAX_UPLOAD_SIZE_MB * 1024 * 1024,
     'THUMBNAIL_SIZE': (200, 280),
     'PAGE_IMAGE_DPI': 150,
     'PAGE_IMAGE_FORMAT': 'JPEG',
@@ -175,7 +225,10 @@ PDF_PROCESSING = {
     'THUMBNAIL_QUALITY': 70,
 }
 
-# AWS S3 settings (optional)
+# =============================================================================
+# AWS S3 Settings (Optional)
+# =============================================================================
+
 if os.getenv('USE_S3', 'false').lower() == 'true':
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -187,13 +240,20 @@ if os.getenv('USE_S3', 'false').lower() == 'true':
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
+# =============================================================================
 # Logging
+# =============================================================================
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
             'style': '{',
         },
     },
