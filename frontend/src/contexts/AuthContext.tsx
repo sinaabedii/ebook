@@ -1,59 +1,82 @@
+/**
+ * Auth Context
+ * Provides authentication state and methods throughout the application
+ */
+
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authApi, handleApiError } from '@/api/djangoApi';
-import type { User, AuthState } from '@/types';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { authApi } from '@/api/djangoApi';
+import { STORAGE_KEYS } from '@/lib/constants';
+import { getStorageItem, removeStorageItem } from '@/lib/utils';
+import type { User, AuthState, RegisterFormData } from '@/types';
+
+// =============================================================================
+// Types
+// =============================================================================
 
 interface AuthContextType extends AuthState {
   login: (phone: string, code: string) => Promise<void>;
-  register: (data: {
-    phone: string;
-    code: string;
-    first_name?: string;
-    last_name?: string;
-    password?: string;
-    organization_code?: string;
-  }) => Promise<void>;
+  register: (data: RegisterFormData) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+// =============================================================================
+// Initial State
+// =============================================================================
+
+const initialState: AuthState = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isLoading: true,
+};
+
+// =============================================================================
+// Context
+// =============================================================================
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    token: null,
-    isAuthenticated: false,
-    isLoading: true,
-  });
+// =============================================================================
+// Provider Component
+// =============================================================================
 
-  // Check for existing token on mount
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [state, setState] = useState<AuthState>(initialState);
+
+  // Initialize auth state from storage
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('auth_token');
-      
-      if (token) {
-        try {
-          const user = await authApi.getProfile();
-          setState({
-            user,
-            token,
-            isAuthenticated: true,
-            isLoading: false,
-          });
-        } catch (error) {
-          // Token invalid - clear it
-          localStorage.removeItem('auth_token');
-          setState({
-            user: null,
-            token: null,
-            isAuthenticated: false,
-            isLoading: false,
-          });
-        }
-      } else {
-        setState(prev => ({ ...prev, isLoading: false }));
+      const token = getStorageItem(STORAGE_KEYS.authToken);
+
+      if (!token) {
+        setState((prev) => ({ ...prev, isLoading: false }));
+        return;
+      }
+
+      try {
+        const user = await authApi.getProfile();
+        setState({
+          user,
+          token,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } catch {
+        // Token invalid - clear it
+        removeStorageItem(STORAGE_KEYS.authToken);
+        setState({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
       }
     };
 
@@ -61,8 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (phone: string, code: string) => {
-    setState(prev => ({ ...prev, isLoading: true }));
-    
+    setState((prev) => ({ ...prev, isLoading: true }));
+
     try {
       const response = await authApi.login(phone, code);
       setState({
@@ -72,21 +95,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
       });
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState((prev) => ({ ...prev, isLoading: false }));
       throw error;
     }
   }, []);
 
-  const register = useCallback(async (data: {
-    phone: string;
-    code: string;
-    first_name?: string;
-    last_name?: string;
-    password?: string;
-    organization_code?: string;
-  }) => {
-    setState(prev => ({ ...prev, isLoading: true }));
-    
+  const register = useCallback(async (data: RegisterFormData) => {
+    setState((prev) => ({ ...prev, isLoading: true }));
+
     try {
       const response = await authApi.register(data);
       setState({
@@ -96,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: false,
       });
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState((prev) => ({ ...prev, isLoading: false }));
       throw error;
     }
   }, []);
@@ -116,33 +132,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     if (!state.token) return;
-    
+
     try {
       const user = await authApi.getProfile();
-      setState(prev => ({ ...prev, user }));
-    } catch (error) {
-      // Token might be invalid
+      setState((prev) => ({ ...prev, user }));
+    } catch {
       await logout();
     }
   }, [state.token, logout]);
 
-  return (
-    <AuthContext.Provider value={{
+  const value = useMemo<AuthContextType>(
+    () => ({
       ...state,
       login,
       register,
       logout,
       refreshUser,
-    }}>
-      {children}
-    </AuthContext.Provider>
+    }),
+    [state, login, register, logout, refreshUser]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
+// =============================================================================
+// Hook
+// =============================================================================
+
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }
+
+export default AuthContext;

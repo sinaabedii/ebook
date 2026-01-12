@@ -1,24 +1,47 @@
-import axios, { AxiosInstance, AxiosProgressEvent } from 'axios';
-import type { 
-  Book, Page, Bookmark, UploadResponse, PaginatedResponse, ApiResponse,
-  User, AuthResponse, OTPResponse, OTPVerifyResponse 
+/**
+ * Django API Client
+ * Centralized API client for all backend communication
+ */
+
+import axios, { AxiosInstance, AxiosProgressEvent, AxiosError } from 'axios';
+import {
+  API_BASE_URL,
+  API_TIMEOUT,
+  UPLOAD_TIMEOUT,
+  STORAGE_KEYS,
+} from '@/lib/constants';
+import { getStorageItem, removeStorageItem, setStorageItem, getFullImageUrl } from '@/lib/utils';
+import type {
+  Book,
+  Page,
+  Bookmark,
+  UploadResponse,
+  PaginatedResponse,
+  User,
+  AuthResponse,
+  OTPResponse,
+  OTPVerifyResponse,
+  RegisterFormData,
+  BookMetadata,
+  ProfileUpdateData,
 } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+// =============================================================================
+// Axios Instance Configuration
+// =============================================================================
 
-// Create axios instance with default config
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor for auth token
+// Request interceptor - attach auth token
 api.interceptors.request.use(
   (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const token = getStorageItem(STORAGE_KEYS.authToken);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,23 +50,25 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
+// Response interceptor - handle 401 unauthorized
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized - redirect to login or refresh token
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-      }
+      removeStorageItem(STORAGE_KEYS.authToken);
     }
     return Promise.reject(error);
   }
 );
 
-// ==================== Book API ====================
+// =============================================================================
+// Book API
+// =============================================================================
+
 export const bookApi = {
-  // Get all books with pagination
+  /**
+   * Fetches paginated list of books
+   */
   getBooks: async (page = 1, pageSize = 10): Promise<PaginatedResponse<Book>> => {
     const response = await api.get<PaginatedResponse<Book>>('/books/', {
       params: { page, page_size: pageSize },
@@ -51,30 +76,40 @@ export const bookApi = {
     return response.data;
   },
 
-  // Get single book by ID
+  /**
+   * Fetches single book by ID
+   */
   getBook: async (id: number): Promise<Book> => {
     const response = await api.get<Book>(`/books/${id}/`);
     return response.data;
   },
 
-  // Create new book (metadata only)
+  /**
+   * Creates a new book
+   */
   createBook: async (data: Partial<Book>): Promise<Book> => {
     const response = await api.post<Book>('/books/', data);
     return response.data;
   },
 
-  // Update book
+  /**
+   * Updates existing book
+   */
   updateBook: async (id: number, data: Partial<Book>): Promise<Book> => {
     const response = await api.patch<Book>(`/books/${id}/`, data);
     return response.data;
   },
 
-  // Delete book
+  /**
+   * Deletes a book
+   */
   deleteBook: async (id: number): Promise<void> => {
     await api.delete(`/books/${id}/`);
   },
 
-  // Search books
+  /**
+   * Searches books by query
+   */
   searchBooks: async (query: string): Promise<Book[]> => {
     const response = await api.get<Book[]>('/books/search/', {
       params: { q: query },
@@ -83,12 +118,17 @@ export const bookApi = {
   },
 };
 
-// ==================== Upload API ====================
+// =============================================================================
+// Upload API
+// =============================================================================
+
 export const uploadApi = {
-  // Upload PDF file
+  /**
+   * Uploads PDF file with metadata
+   */
   uploadPdf: async (
     file: File,
-    metadata: { title?: string; description?: string },
+    metadata: BookMetadata,
     onProgress?: (progress: number) => void
   ): Promise<UploadResponse> => {
     const formData = new FormData();
@@ -97,44 +137,49 @@ export const uploadApi = {
     if (metadata.description) formData.append('description', metadata.description);
 
     const response = await api.post<UploadResponse>('/upload/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      timeout: 600000, // 10 minutes for large files
-      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-        if (progressEvent.total && onProgress) {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          onProgress(progress);
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: UPLOAD_TIMEOUT,
+      onUploadProgress: (event: AxiosProgressEvent) => {
+        if (event.total && onProgress) {
+          onProgress(Math.round((event.loaded * 100) / event.total));
         }
       },
     });
     return response.data;
   },
 
-  // Check upload/processing status
+  /**
+   * Checks processing status of uploaded book
+   */
   checkStatus: async (bookId: number): Promise<UploadResponse> => {
     const response = await api.get<UploadResponse>(`/upload/status/${bookId}/`);
     return response.data;
   },
 
-  // Cancel upload
+  /**
+   * Cancels ongoing upload
+   */
   cancelUpload: async (bookId: number): Promise<void> => {
     await api.post(`/upload/cancel/${bookId}/`);
   },
 };
 
-// ==================== Pages API ====================
+// =============================================================================
+// Pages API
+// =============================================================================
+
 export const pagesApi = {
-  // Get all pages for a book
+  /**
+   * Fetches all pages for a book (handles pagination automatically)
+   */
   getPages: async (bookId: number): Promise<Page[]> => {
     const response = await api.get(`/pages/${bookId}/`);
-    // Handle both paginated and non-paginated responses
+
+    // Handle paginated response
     if (response.data.results) {
-      // Paginated response - fetch all pages
       let allPages: Page[] = response.data.results;
       let nextUrl = response.data.next;
-      
-      // Fetch remaining pages if paginated
+
       while (nextUrl) {
         const nextResponse = await axios.get(nextUrl);
         allPages = [...allPages, ...nextResponse.data.results];
@@ -142,17 +187,21 @@ export const pagesApi = {
       }
       return allPages;
     }
-    // Non-paginated response
+
     return response.data;
   },
 
-  // Get single page
+  /**
+   * Fetches single page by number
+   */
   getPage: async (bookId: number, pageNumber: number): Promise<Page> => {
     const response = await api.get<Page>(`/pages/${bookId}/${pageNumber}/`);
     return response.data;
   },
 
-  // Get page range (for preloading)
+  /**
+   * Fetches range of pages
+   */
   getPageRange: async (bookId: number, start: number, end: number): Promise<Page[]> => {
     const response = await api.get<Page[]>(`/pages/${bookId}/range/`, {
       params: { start, end },
@@ -161,9 +210,14 @@ export const pagesApi = {
   },
 };
 
-// ==================== Bookmark API ====================
+// =============================================================================
+// Bookmark API
+// =============================================================================
+
 export const bookmarkApi = {
-  // Get all bookmarks for a book
+  /**
+   * Fetches bookmarks for a book
+   */
   getBookmarks: async (bookId: number): Promise<Bookmark[]> => {
     const response = await api.get<Bookmark[]>('/bookmarks/', {
       params: { book_id: bookId },
@@ -171,97 +225,110 @@ export const bookmarkApi = {
     return response.data;
   },
 
-  // Create bookmark
-  createBookmark: async (data: { book_id: number; page_number: number; note?: string }): Promise<Bookmark> => {
+  /**
+   * Creates a new bookmark
+   */
+  createBookmark: async (data: {
+    book_id: number;
+    page_number: number;
+    note?: string;
+  }): Promise<Bookmark> => {
     const response = await api.post<Bookmark>('/bookmarks/', data);
     return response.data;
   },
 
-  // Update bookmark
+  /**
+   * Updates existing bookmark
+   */
   updateBookmark: async (id: number, data: Partial<Bookmark>): Promise<Bookmark> => {
     const response = await api.patch<Bookmark>(`/bookmarks/${id}/`, data);
     return response.data;
   },
 
-  // Delete bookmark
+  /**
+   * Deletes a bookmark
+   */
   deleteBookmark: async (id: number): Promise<void> => {
     await api.delete(`/bookmarks/${id}/`);
   },
 };
 
-// ==================== Auth API ====================
+// =============================================================================
+// Auth API
+// =============================================================================
+
 export const authApi = {
-  // Request OTP code
+  /**
+   * Requests OTP for phone number
+   */
   requestOTP: async (phone: string): Promise<OTPResponse> => {
     const response = await api.post<OTPResponse>('/auth/otp/request/', { phone });
     return response.data;
   },
 
-  // Verify OTP code
+  /**
+   * Verifies OTP code
+   */
   verifyOTP: async (phone: string, code: string): Promise<OTPVerifyResponse> => {
     const response = await api.post<OTPVerifyResponse>('/auth/otp/verify/', { phone, code });
     return response.data;
   },
 
-  // Register new user
-  register: async (data: {
-    phone: string;
-    code: string;
-    first_name?: string;
-    last_name?: string;
-    password?: string;
-    organization_code?: string;
-  }): Promise<AuthResponse> => {
+  /**
+   * Registers new user
+   */
+  register: async (data: RegisterFormData): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/register/', data);
-    // Store token
-    if (response.data.access_token && typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', response.data.access_token);
+    if (response.data.access_token) {
+      setStorageItem(STORAGE_KEYS.authToken, response.data.access_token);
     }
     return response.data;
   },
 
-  // Login with OTP
+  /**
+   * Logs in existing user
+   */
   login: async (phone: string, code: string): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/login/', { phone, code });
-    // Store token
-    if (response.data.access_token && typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', response.data.access_token);
+    if (response.data.access_token) {
+      setStorageItem(STORAGE_KEYS.authToken, response.data.access_token);
     }
     return response.data;
   },
 
-  // Logout
+  /**
+   * Logs out current user
+   */
   logout: async (): Promise<void> => {
     try {
       await api.post('/auth/logout/');
     } finally {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-      }
+      removeStorageItem(STORAGE_KEYS.authToken);
     }
   },
 
-  // Get current user profile
+  /**
+   * Fetches current user profile
+   */
   getProfile: async (): Promise<User> => {
     const response = await api.get<User>('/auth/profile/');
     return response.data;
   },
 
-  // Update profile
-  updateProfile: async (data: {
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-    national_id?: string;
-  }): Promise<User> => {
+  /**
+   * Updates user profile
+   */
+  updateProfile: async (data: ProfileUpdateData): Promise<User> => {
     const response = await api.patch<User>('/auth/profile/', data);
     return response.data;
   },
 
-  // Change password
+  /**
+   * Changes user password
+   */
   changePassword: async (
-    oldPassword: string, 
-    newPassword: string, 
+    oldPassword: string,
+    newPassword: string,
     newPasswordConfirm: string
   ): Promise<{ message: string }> => {
     const response = await api.post('/auth/change-password/', {
@@ -273,29 +340,45 @@ export const authApi = {
   },
 };
 
-// ==================== Helper Functions ====================
-export const getFullImageUrl = (path: string): string => {
-  if (path.startsWith('http')) return path;
-  const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL || API_BASE_URL;
-  return `${cdnUrl}${path}`;
-};
+// =============================================================================
+// Error Handling
+// =============================================================================
 
-export const handleApiError = (error: unknown): string => {
+interface ApiErrorData {
+  message?: string;
+  detail?: string;
+  error?: string;
+}
+
+/**
+ * Extracts user-friendly error message from API error
+ * @param error - Error object from API call
+ * @returns User-friendly error message in Persian
+ */
+export function handleApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
-    if (error.response) {
-      // Server responded with error
-      const data = error.response.data;
+    const axiosError = error as AxiosError<ApiErrorData>;
+
+    if (axiosError.response) {
+      const data = axiosError.response.data;
       if (typeof data === 'string') return data;
-      if (data.message) return data.message;
-      if (data.detail) return data.detail;
-      if (data.error) return data.error;
-      return `خطای سرور: ${error.response.status}`;
-    } else if (error.request) {
-      // No response received
+      if (data?.message) return data.message;
+      if (data?.detail) return data.detail;
+      if (data?.error) return data.error;
+      return `خطای سرور: ${axiosError.response.status}`;
+    }
+
+    if (axiosError.request) {
       return 'ارتباط با سرور برقرار نشد';
     }
   }
-  return 'خطای ناشناخته رخ داد';
-};
 
+  return 'خطای ناشناخته رخ داد';
+}
+
+// =============================================================================
+// Exports
+// =============================================================================
+
+export { getFullImageUrl };
 export default api;

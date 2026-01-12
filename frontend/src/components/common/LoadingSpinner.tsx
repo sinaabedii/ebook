@@ -1,17 +1,47 @@
+/**
+ * Loading Components
+ * Various loading indicators and skeleton loaders
+ */
+
 import React from 'react';
 
+// =============================================================================
+// Types
+// =============================================================================
+
+type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl';
+
 interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: SpinnerSize;
   className?: string;
   text?: string;
 }
 
-const sizeClasses = {
+interface ProgressBarProps {
+  progress: number;
+  showPercentage?: boolean;
+  className?: string;
+  label?: string;
+}
+
+interface SkeletonProps {
+  className?: string;
+}
+
+// =============================================================================
+// Size Classes
+// =============================================================================
+
+const sizeClasses: Record<SpinnerSize, string> = {
   sm: 'w-4 h-4',
   md: 'w-8 h-8',
   lg: 'w-12 h-12',
   xl: 'w-16 h-16',
 };
+
+// =============================================================================
+// Loading Spinner
+// =============================================================================
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
@@ -21,24 +51,21 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   return (
     <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
       <div className="relative">
-        {/* Outer ring */}
-        <div
-          className={`${sizeClasses[size]} rounded-full border-4 border-slate-700 animate-pulse`}
-        />
-        {/* Inner spinning ring */}
+        <div className={`${sizeClasses[size]} rounded-full border-4 border-slate-700 animate-pulse`} />
         <div
           className={`${sizeClasses[size]} absolute top-0 left-0 rounded-full border-4 border-transparent border-t-primary-500 animate-spin`}
         />
       </div>
-      {text && (
-        <span className="text-sm text-slate-400 animate-pulse">{text}</span>
-      )}
+      {text && <span className="text-sm text-slate-400 animate-pulse">{text}</span>}
     </div>
   );
 };
 
-// Book-specific loading animation
-export const BookLoadingSpinner: React.FC<{ className?: string }> = ({ className }) => {
+// =============================================================================
+// Book Loading Spinner
+// =============================================================================
+
+export const BookLoadingSpinner: React.FC<SkeletonProps> = ({ className = '' }) => {
   return (
     <div className={`flex flex-col items-center justify-center gap-4 ${className}`}>
       <div className="relative w-16 h-20">
@@ -49,7 +76,6 @@ export const BookLoadingSpinner: React.FC<{ className?: string }> = ({ className
           {/* Pages animation */}
           <div className="absolute right-1 top-1 bottom-1 left-3 bg-amber-50 rounded-r-sm overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-300/50 to-transparent animate-pulse" />
-            {/* Page lines */}
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
@@ -70,13 +96,9 @@ export const BookLoadingSpinner: React.FC<{ className?: string }> = ({ className
   );
 };
 
-// Progress bar component
-interface ProgressBarProps {
-  progress: number;
-  showPercentage?: boolean;
-  className?: string;
-  label?: string;
-}
+// =============================================================================
+// Progress Bar
+// =============================================================================
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
@@ -95,16 +117,16 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         </div>
       )}
       <div className="progress-bar">
-        <div
-          className="progress-bar-fill"
-          style={{ width: `${clampedProgress}%` }}
-        />
+        <div className="progress-bar-fill" style={{ width: `${clampedProgress}%` }} />
       </div>
     </div>
   );
 };
 
-// Skeleton loader for book cards
+// =============================================================================
+// Book Card Skeleton
+// =============================================================================
+
 export const BookCardSkeleton: React.FC = () => {
   return (
     <div className="book-card p-4 animate-pulse">
@@ -119,8 +141,11 @@ export const BookCardSkeleton: React.FC = () => {
   );
 };
 
-// Page skeleton for flipbook viewer
-export const PageSkeleton: React.FC<{ className?: string }> = ({ className }) => {
+// =============================================================================
+// Page Skeleton
+// =============================================================================
+
+export const PageSkeleton: React.FC<SkeletonProps> = ({ className = '' }) => {
   return (
     <div className={`skeleton ${className}`}>
       <div className="absolute inset-4">

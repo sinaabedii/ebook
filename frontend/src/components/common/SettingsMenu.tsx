@@ -1,10 +1,27 @@
+/**
+ * Settings Menu Components
+ * Theme and language toggle components
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Settings, Moon, Sun, Globe, Check, X } from 'lucide-react';
+import { Settings, Moon, Sun, Check, X } from 'lucide-react';
 import { useTheme, useLanguage } from '@/contexts';
+
+// =============================================================================
+// Types
+// =============================================================================
 
 interface SettingsMenuProps {
   className?: string;
 }
+
+interface ToggleButtonProps {
+  className?: string;
+}
+
+// =============================================================================
+// Settings Menu Component
+// =============================================================================
 
 export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,7 +58,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
       {/* Settings Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-2.5 rounded-xl transition-all duration-200 ${isOpen ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25' : 'btn-icon'}`}
+        className={`p-2.5 rounded-xl transition-all duration-200 ${
+          isOpen ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25' : 'btn-icon'
+        }`}
         aria-label={t('common.settings')}
         title={t('common.settings')}
       >
@@ -50,16 +69,21 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div 
-          className={`absolute top-full mt-2 z-50 w-64 rounded-xl overflow-hidden shadow-xl ${isRTL ? 'left-0' : 'right-0'}`}
+        <div
+          className={`absolute top-full mt-2 z-50 w-64 rounded-xl overflow-hidden shadow-xl ${
+            isRTL ? 'left-0' : 'right-0'
+          }`}
           style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
         >
           {/* Header */}
-          <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <div
+            className="px-4 py-3 flex items-center justify-between"
+            style={{ borderBottom: '1px solid var(--border-color)' }}
+          >
             <h3 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
               {t('common.settings')}
             </h3>
-            <button 
+            <button
               onClick={() => setIsOpen(false)}
               className="p-1 rounded-lg transition-opacity hover:opacity-70"
               style={{ color: 'var(--text-tertiary)' }}
@@ -72,13 +96,18 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
           <div className="p-2">
             {/* Theme Toggle */}
             <div className="mb-2">
-              <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
+              <p
+                className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
                 {t('common.theme')}
               </p>
               <div className="flex gap-1">
                 <button
                   onClick={() => !isDark || toggleTheme()}
-                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${!isDark ? 'bg-primary-500/20 text-primary-500 font-medium' : ''}`}
+                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
+                    !isDark ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                  }`}
                   style={isDark ? { color: 'var(--text-secondary)' } : {}}
                 >
                   <Sun className="w-4 h-4" />
@@ -87,7 +116,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
                 </button>
                 <button
                   onClick={() => isDark || toggleTheme()}
-                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${isDark ? 'bg-primary-500/20 text-primary-500 font-medium' : ''}`}
+                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
+                    isDark ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                  }`}
                   style={!isDark ? { color: 'var(--text-secondary)' } : {}}
                 >
                   <Moon className="w-4 h-4" />
@@ -99,13 +130,18 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
 
             {/* Language Toggle */}
             <div>
-              <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
+              <p
+                className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
                 {t('common.language')}
               </p>
               <div className="flex gap-1">
                 <button
                   onClick={() => language !== 'fa' && toggleLanguage()}
-                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${language === 'fa' ? 'bg-primary-500/20 text-primary-500 font-medium' : ''}`}
+                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
+                    language === 'fa' ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                  }`}
                   style={language !== 'fa' ? { color: 'var(--text-secondary)' } : {}}
                 >
                   <span className="text-sm">🇮🇷</span>
@@ -114,7 +150,9 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
                 </button>
                 <button
                   onClick={() => language !== 'en' && toggleLanguage()}
-                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${language === 'en' ? 'bg-primary-500/20 text-primary-500 font-medium' : ''}`}
+                  className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all ${
+                    language === 'en' ? 'bg-primary-500/20 text-primary-500 font-medium' : ''
+                  }`}
                   style={language !== 'en' ? { color: 'var(--text-secondary)' } : {}}
                 >
                   <span className="text-sm">🇺🇸</span>
@@ -130,20 +168,18 @@ export const SettingsMenu: React.FC<SettingsMenuProps> = ({ className = '' }) =>
   );
 };
 
-// Quick toggle buttons for header
-export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
+// =============================================================================
+// Theme Toggle Button
+// =============================================================================
+
+export const ThemeToggle: React.FC<ToggleButtonProps> = ({ className = '' }) => {
   const { isDark, toggleTheme } = useTheme();
   const { t } = useLanguage();
 
   return (
     <button
       onClick={toggleTheme}
-      className={`
-        p-2.5 rounded-xl transition-all duration-200
-        bg-surface-800/50 text-surface-400 hover:bg-surface-700 hover:text-white
-        dark:bg-surface-700/50 dark:hover:bg-surface-600
-        ${className}
-      `}
+      className={`p-2.5 rounded-xl transition-all duration-200 bg-surface-800/50 text-surface-400 hover:bg-surface-700 hover:text-white ${className}`}
       aria-label={isDark ? t('common.lightMode') : t('common.darkMode')}
       title={isDark ? t('common.lightMode') : t('common.darkMode')}
     >
@@ -152,22 +188,21 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
   );
 };
 
-export const LanguageToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
+// =============================================================================
+// Language Toggle Button
+// =============================================================================
+
+export const LanguageToggle: React.FC<ToggleButtonProps> = ({ className = '' }) => {
   const { language, toggleLanguage, t } = useLanguage();
 
   return (
     <button
       onClick={toggleLanguage}
-      className={`
-        p-2.5 rounded-xl transition-all duration-200
-        bg-surface-800/50 text-surface-400 hover:bg-surface-700 hover:text-white
-        dark:bg-surface-700/50 dark:hover:bg-surface-600
-        ${className}
-      `}
+      className={`p-2.5 rounded-xl transition-all duration-200 bg-surface-800/50 text-surface-400 hover:bg-surface-700 hover:text-white ${className}`}
       aria-label={t('common.language')}
       title={language === 'fa' ? 'English' : 'فارسی'}
     >
-      <Globe className="w-5 h-5" />
+      <span className="text-sm font-medium">{language === 'fa' ? 'EN' : 'فا'}</span>
     </button>
   );
 };

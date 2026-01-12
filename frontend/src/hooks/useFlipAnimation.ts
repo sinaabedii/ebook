@@ -1,5 +1,14 @@
+/**
+ * Flip Animation Hook
+ * Manages page flip animations and gesture handling for the book viewer
+ */
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { FlipAnimation, GestureState } from '@/types';
+
+// =============================================================================
+// Types
+// =============================================================================
 
 interface FlipAnimationConfig {
   duration?: number;
@@ -8,27 +17,42 @@ interface FlipAnimationConfig {
   onFlipEnd?: (direction: 'left' | 'right') => void;
 }
 
+interface GestureHandlers {
+  onTouchStart: (e: React.TouchEvent) => void;
+  onTouchMove: (e: React.TouchEvent) => void;
+  onTouchEnd: (e: React.TouchEvent) => void;
+  onMouseDown: (e: React.MouseEvent) => void;
+  onMouseMove: (e: React.MouseEvent) => void;
+  onMouseUp: (e: React.MouseEvent) => void;
+  onMouseLeave: (e: React.MouseEvent) => void;
+}
+
 interface UseFlipAnimationReturn {
   animation: FlipAnimation;
   isFlipping: boolean;
   flipLeft: () => void;
   flipRight: () => void;
   cancelFlip: () => void;
-  handlers: {
-    onTouchStart: (e: React.TouchEvent) => void;
-    onTouchMove: (e: React.TouchEvent) => void;
-    onTouchEnd: (e: React.TouchEvent) => void;
-    onMouseDown: (e: React.MouseEvent) => void;
-    onMouseMove: (e: React.MouseEvent) => void;
-    onMouseUp: (e: React.MouseEvent) => void;
-    onMouseLeave: (e: React.MouseEvent) => void;
-  };
+  handlers: GestureHandlers;
 }
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+const DEFAULT_DURATION = 600;
+const DEFAULT_THRESHOLD = 50;
+const DRAG_SENSITIVITY = 200;
+const MIN_DRAG_DISTANCE = 10;
+
+// =============================================================================
+// Hook Implementation
+// =============================================================================
 
 export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnimationReturn {
   const {
-    duration = 600,
-    threshold = 50,
+    duration = DEFAULT_DURATION,
+    threshold = DEFAULT_THRESHOLD,
     onFlipStart,
     onFlipEnd,
   } = config;
@@ -47,12 +71,10 @@ export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnima
     velocity: 0,
     direction: null,
   });
-
   const isDraggingRef = useRef(false);
   const animationFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
 
-  // Cleanup animation frame on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
@@ -61,57 +83,41 @@ export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnima
     };
   }, []);
 
-  const animateFlip = useCallback((
-    direction: 'left' | 'right',
-    startProgress = 0
-  ) => {
-    const startTime = performance.now();
-    const endProgress = 100;
-    const progressDelta = endProgress - startProgress;
+  const animateFlip = useCallback(
+    (direction: 'left' | 'right', startProgress = 0) => {
+      const startTime = performance.now();
+      const endProgress = 100;
+      const progressDelta = endProgress - startProgress;
 
-    setAnimation(prev => ({
-      ...prev,
-      direction,
-      isActive: true,
-    }));
+      setAnimation((prev) => ({ ...prev, direction, isActive: true }));
+      onFlipStart?.(direction);
 
-    onFlipStart?.(direction);
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const rawProgress = startProgress + (progressDelta * elapsed) / duration;
+        const progress = Math.min(rawProgress, 100);
 
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const rawProgress = startProgress + (progressDelta * (elapsed / duration));
-      const progress = Math.min(rawProgress, 100);
+        setAnimation((prev) => ({ ...prev, progress }));
 
-      setAnimation(prev => ({
-        ...prev,
-        progress,
-      }));
+        if (progress < 100) {
+          animationFrameRef.current = requestAnimationFrame(animate);
+        } else {
+          setAnimation({ direction, progress: 0, isActive: false });
+          onFlipEnd?.(direction);
+        }
+      };
 
-      if (progress < 100) {
-        animationFrameRef.current = requestAnimationFrame(animate);
-      } else {
-        setAnimation({
-          direction,
-          progress: 0,
-          isActive: false,
-        });
-        onFlipEnd?.(direction);
-      }
-    };
-
-    animationFrameRef.current = requestAnimationFrame(animate);
-  }, [duration, onFlipStart, onFlipEnd]);
+      animationFrameRef.current = requestAnimationFrame(animate);
+    },
+    [duration, onFlipStart, onFlipEnd]
+  );
 
   const flipLeft = useCallback(() => {
-    if (!animation.isActive) {
-      animateFlip('left');
-    }
+    if (!animation.isActive) animateFlip('left');
   }, [animation.isActive, animateFlip]);
 
   const flipRight = useCallback(() => {
-    if (!animation.isActive) {
-      animateFlip('right');
-    }
+    if (!animation.isActive) animateFlip('right');
   }, [animation.isActive, animateFlip]);
 
   const cancelFlip = useCallback(() => {
@@ -119,14 +125,9 @@ export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnima
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
-    setAnimation({
-      direction: 'right',
-      progress: 0,
-      isActive: false,
-    });
+    setAnimation({ direction: 'right', progress: 0, isActive: false });
   }, []);
 
-  // Touch/Mouse event handlers
   const handleStart = useCallback((clientX: number, clientY: number) => {
     isDraggingRef.current = true;
     lastTimeRef.current = performance.now();
@@ -149,7 +150,6 @@ export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnima
     const deltaY = clientY - gestureRef.current.startY;
     const velocity = Math.abs(deltaX) / deltaTime;
 
-    // Determine direction
     let direction: 'left' | 'right' | 'up' | 'down' | null = null;
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       direction = deltaX > 0 ? 'right' : 'left';
@@ -157,19 +157,11 @@ export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnima
       direction = deltaY > 0 ? 'down' : 'up';
     }
 
-    gestureRef.current = {
-      ...gestureRef.current,
-      deltaX,
-      deltaY,
-      velocity,
-      direction,
-    };
-
+    gestureRef.current = { ...gestureRef.current, deltaX, deltaY, velocity, direction };
     lastTimeRef.current = currentTime;
 
-    // Update animation progress during drag
-    if (Math.abs(deltaX) > 10) {
-      const progress = Math.min(Math.abs(deltaX) / 200 * 100, 50);
+    if (Math.abs(deltaX) > MIN_DRAG_DISTANCE) {
+      const progress = Math.min((Math.abs(deltaX) / DRAG_SENSITIVITY) * 100, 50);
       setAnimation({
         direction: deltaX > 0 ? 'right' : 'left',
         progress,
@@ -184,54 +176,27 @@ export function useFlipAnimation(config: FlipAnimationConfig = {}): UseFlipAnima
 
     const { deltaX, velocity, direction } = gestureRef.current;
 
-    // Check if gesture meets threshold for flip
     if (
       (Math.abs(deltaX) > threshold || velocity > 0.5) &&
       (direction === 'left' || direction === 'right')
     ) {
       animateFlip(direction, animation.progress);
     } else {
-      // Cancel animation
       cancelFlip();
     }
   }, [threshold, animation.progress, animateFlip, cancelFlip]);
 
-  const handlers = {
-    onTouchStart: (e: React.TouchEvent) => {
-      const touch = e.touches[0];
-      handleStart(touch.clientX, touch.clientY);
-    },
-    onTouchMove: (e: React.TouchEvent) => {
-      const touch = e.touches[0];
-      handleMove(touch.clientX, touch.clientY);
-    },
-    onTouchEnd: () => {
-      handleEnd();
-    },
-    onMouseDown: (e: React.MouseEvent) => {
-      handleStart(e.clientX, e.clientY);
-    },
-    onMouseMove: (e: React.MouseEvent) => {
-      handleMove(e.clientX, e.clientY);
-    },
-    onMouseUp: () => {
-      handleEnd();
-    },
-    onMouseLeave: () => {
-      if (isDraggingRef.current) {
-        handleEnd();
-      }
-    },
+  const handlers: GestureHandlers = {
+    onTouchStart: (e) => handleStart(e.touches[0].clientX, e.touches[0].clientY),
+    onTouchMove: (e) => handleMove(e.touches[0].clientX, e.touches[0].clientY),
+    onTouchEnd: () => handleEnd(),
+    onMouseDown: (e) => handleStart(e.clientX, e.clientY),
+    onMouseMove: (e) => handleMove(e.clientX, e.clientY),
+    onMouseUp: () => handleEnd(),
+    onMouseLeave: () => isDraggingRef.current && handleEnd(),
   };
 
-  return {
-    animation,
-    isFlipping: animation.isActive,
-    flipLeft,
-    flipRight,
-    cancelFlip,
-    handlers,
-  };
+  return { animation, isFlipping: animation.isActive, flipLeft, flipRight, cancelFlip, handlers };
 }
 
 export default useFlipAnimation;

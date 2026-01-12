@@ -1,3 +1,7 @@
+/**
+ * PDF Components Exports
+ */
+
 export { PdfUploader } from './PdfUploader';
 export { FlipBookViewer } from './FlipBookViewer';
 export { PresentationViewer } from './PresentationViewer';

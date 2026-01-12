@@ -1,12 +1,21 @@
+/**
+ * Next.js App Component
+ * Root component that wraps all pages with providers
+ */
+
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useEffect } from 'react';
 import { AuthProvider, ThemeProvider, LanguageProvider } from '@/contexts';
 
+// =============================================================================
+// App Component
+// =============================================================================
+
 export default function App({ Component, pageProps }: AppProps) {
+  // Register service worker for PWA support
   useEffect(() => {
-    // Register service worker for PWA support
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       navigator.serviceWorker.register('/sw.js').catch(console.error);
     }

@@ -1,7 +1,17 @@
+/**
+ * PDF Uploader Component
+ * Drag-and-drop file upload with progress tracking
+ */
+
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, X, AlertCircle, CheckCircle } from 'lucide-react';
 import { ProgressBar } from '@/components/common';
+import { formatFileSize } from '@/lib/utils';
+
+// =============================================================================
+// Types
+// =============================================================================
 
 interface PdfUploaderProps {
   onUpload: (file: File) => Promise<void>;
@@ -11,62 +21,64 @@ interface PdfUploaderProps {
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error';
 
-export const PdfUploader: React.FC<PdfUploaderProps> = ({
-  onUpload,
-  maxSize = 500,
-  className = '',
-}) => {
+// =============================================================================
+// Component
+// =============================================================================
+
+export const PdfUploader: React.FC<PdfUploaderProps> = ({ onUpload, maxSize = 500, className = '' }) => {
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    
-    if (!file) return;
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-    // Validate file type
-    if (file.type !== 'application/pdf') {
-      setErrorMessage('فقط فایل‌های PDF قابل قبول هستند');
-      setUploadStatus('error');
-      return;
-    }
+      // Validate file type
+      if (file.type !== 'application/pdf') {
+        setErrorMessage('فقط فایل‌های PDF قابل قبول هستند');
+        setUploadStatus('error');
+        return;
+      }
 
-    // Validate file size
-    if (file.size > maxSize * 1024 * 1024) {
-      setErrorMessage(`حداکثر حجم فایل ${maxSize} مگابایت است`);
-      setUploadStatus('error');
-      return;
-    }
+      // Validate file size
+      if (file.size > maxSize * 1024 * 1024) {
+        setErrorMessage(`حداکثر حجم فایل ${maxSize} مگابایت است`);
+        setUploadStatus('error');
+        return;
+      }
 
-    setSelectedFile(file);
-    setUploadStatus('uploading');
-    setErrorMessage('');
-    setUploadProgress(0);
+      setSelectedFile(file);
+      setUploadStatus('uploading');
+      setErrorMessage('');
+      setUploadProgress(0);
 
-    // Simulate upload progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return prev;
-        }
-        return prev + 10;
-      });
-    }, 200);
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return prev;
+          }
+          return prev + 10;
+        });
+      }, 200);
 
-    try {
-      await onUpload(file);
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-      setUploadStatus('success');
-    } catch (error) {
-      clearInterval(progressInterval);
-      setUploadStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'خطا در آپلود فایل');
-    }
-  }, [maxSize, onUpload]);
+      try {
+        await onUpload(file);
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        setUploadStatus('success');
+      } catch (error) {
+        clearInterval(progressInterval);
+        setUploadStatus('error');
+        setErrorMessage(error instanceof Error ? error.message : 'خطا در آپلود فایل');
+      }
+    },
+    [maxSize, onUpload]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -82,46 +94,33 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
     setErrorMessage('');
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
-
   return (
     <div className={`w-full ${className}`}>
+      {/* Idle State - Dropzone */}
       {uploadStatus === 'idle' && (
-        <div
-          {...getRootProps()}
-          className={`
-            upload-zone
-            ${isDragActive ? 'dragging' : ''}
-          `}
-        >
+        <div {...getRootProps()} className={`upload-zone ${isDragActive ? 'dragging' : ''}`}>
           <input {...getInputProps()} />
           <div className="flex flex-col items-center gap-4">
-            <div className={`
-              p-4 rounded-full transition-all duration-300
-              ${isDragActive ? 'bg-primary-500/20 scale-110' : 'bg-slate-700/50'}
-            `}>
+            <div
+              className={`p-4 rounded-full transition-all duration-300 ${
+                isDragActive ? 'bg-primary-500/20 scale-110' : 'bg-slate-700/50'
+              }`}
+            >
               <Upload className={`w-10 h-10 ${isDragActive ? 'text-primary-400' : 'text-slate-400'}`} />
             </div>
-            
+
             <div>
               <p className="text-lg font-medium text-white mb-1">
                 {isDragActive ? 'فایل را اینجا رها کنید' : 'PDF خود را آپلود کنید'}
               </p>
-              <p className="text-sm text-slate-400">
-                فایل را بکشید و اینجا رها کنید یا کلیک کنید
-              </p>
-              <p className="text-xs text-slate-500 mt-2">
-                حداکثر حجم: {maxSize} مگابایت
-              </p>
+              <p className="text-sm text-slate-400">فایل را بکشید و اینجا رها کنید یا کلیک کنید</p>
+              <p className="text-xs text-slate-500 mt-2">حداکثر حجم: {maxSize} مگابایت</p>
             </div>
           </div>
         </div>
       )}
 
+      {/* Uploading State */}
       {uploadStatus === 'uploading' && selectedFile && (
         <div className="glass p-6 rounded-xl">
           <div className="flex items-start gap-4 mb-4">
@@ -140,14 +139,12 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
               <X className="w-5 h-5 text-slate-400" />
             </button>
           </div>
-          
-          <ProgressBar
-            progress={uploadProgress}
-            label="در حال آپلود..."
-          />
+
+          <ProgressBar progress={uploadProgress} label="در حال آپلود..." />
         </div>
       )}
 
+      {/* Success State */}
       {uploadStatus === 'success' && selectedFile && (
         <div className="glass p-6 rounded-xl border border-green-500/30">
           <div className="flex items-center gap-4 mb-4">
@@ -159,17 +156,17 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
               <p className="text-sm text-slate-400">{selectedFile.name}</p>
             </div>
           </div>
-          
+
           <button
             onClick={resetUpload}
-            className="w-full py-2 px-4 rounded-lg bg-slate-700/50 hover:bg-slate-700 
-                       text-white transition-colors"
+            className="w-full py-2 px-4 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-white transition-colors"
           >
             آپلود فایل جدید
           </button>
         </div>
       )}
 
+      {/* Error State */}
       {uploadStatus === 'error' && (
         <div className="glass p-6 rounded-xl border border-red-500/30">
           <div className="flex items-center gap-4 mb-4">
@@ -181,11 +178,10 @@ export const PdfUploader: React.FC<PdfUploaderProps> = ({
               <p className="text-sm text-slate-400">{errorMessage}</p>
             </div>
           </div>
-          
+
           <button
             onClick={resetUpload}
-            className="w-full py-2 px-4 rounded-lg bg-slate-700/50 hover:bg-slate-700 
-                       text-white transition-colors"
+            className="w-full py-2 px-4 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-white transition-colors"
           >
             تلاش مجدد
           </button>

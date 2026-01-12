@@ -1,3 +1,8 @@
+/**
+ * Page Controls Components
+ * Navigation and settings controls for the book viewer
+ */
+
 import React from 'react';
 import {
   ChevronLeft,
@@ -14,6 +19,10 @@ import {
 } from 'lucide-react';
 import type { ViewerSettings } from '@/types';
 
+// =============================================================================
+// Types
+// =============================================================================
+
 interface PageControlsProps {
   currentPage: number;
   totalPages: number;
@@ -24,6 +33,19 @@ interface PageControlsProps {
   onToggleFullscreen: () => void;
   className?: string;
 }
+
+interface CompactPageControlsProps {
+  currentPage: number;
+  totalPages: number;
+  isFullscreen: boolean;
+  onPageChange: (page: number) => void;
+  onToggleFullscreen: () => void;
+  className?: string;
+}
+
+// =============================================================================
+// Full Page Controls (Desktop)
+// =============================================================================
 
 export const PageControls: React.FC<PageControlsProps> = ({
   currentPage,
@@ -72,7 +94,7 @@ export const PageControls: React.FC<PageControlsProps> = ({
         >
           <ChevronsRight className="w-5 h-5" />
         </button>
-        
+
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={!canGoPrevious}
@@ -89,9 +111,7 @@ export const PageControls: React.FC<PageControlsProps> = ({
             type="number"
             value={currentPage}
             onChange={(e) => goToPage(parseInt(e.target.value) || 1)}
-            className="w-12 text-center bg-transparent text-white outline-none 
-                       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none 
-                       [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-12 text-center bg-transparent text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             min={1}
             max={totalPages}
           />
@@ -108,7 +128,7 @@ export const PageControls: React.FC<PageControlsProps> = ({
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        
+
         <button
           onClick={() => goToPage(totalPages)}
           disabled={!canGoNext}
@@ -132,11 +152,11 @@ export const PageControls: React.FC<PageControlsProps> = ({
         >
           <ZoomOut className="w-5 h-5" />
         </button>
-        
+
         <span className="px-2 text-sm text-slate-400 min-w-[4rem] text-center">
           {Math.round(settings.zoomLevel * 100)}%
         </span>
-        
+
         <button
           onClick={handleZoomIn}
           disabled={settings.zoomLevel >= 3}
@@ -170,11 +190,7 @@ export const PageControls: React.FC<PageControlsProps> = ({
           aria-label={isFullscreen ? 'خروج از تمام صفحه' : 'تمام صفحه'}
           title={isFullscreen ? 'خروج از تمام صفحه' : 'تمام صفحه'}
         >
-          {isFullscreen ? (
-            <Minimize className="w-5 h-5" />
-          ) : (
-            <Maximize className="w-5 h-5" />
-          )}
+          {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
         </button>
 
         {/* Settings */}
@@ -191,8 +207,11 @@ export const PageControls: React.FC<PageControlsProps> = ({
   );
 };
 
-// Compact controls for mobile
-export const CompactPageControls: React.FC<Omit<PageControlsProps, 'settings' | 'onSettingsChange'>> = ({
+// =============================================================================
+// Compact Page Controls (Mobile)
+// =============================================================================
+
+export const CompactPageControls: React.FC<CompactPageControlsProps> = ({
   currentPage,
   totalPages,
   isFullscreen,

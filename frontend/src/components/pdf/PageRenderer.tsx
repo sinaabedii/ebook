@@ -1,5 +1,14 @@
+/**
+ * Page Renderer Components
+ * Components for rendering book pages and thumbnails
+ */
+
 import React, { useEffect, useState, useRef, memo } from 'react';
 import { PageSkeleton } from '@/components/common';
+
+// =============================================================================
+// Types
+// =============================================================================
 
 interface PageRendererProps {
   pageNumber: number;
@@ -12,6 +21,18 @@ interface PageRendererProps {
   onLoad?: () => void;
   onError?: (error: Error) => void;
 }
+
+interface PageThumbnailProps {
+  pageNumber: number;
+  imageUrl: string | null;
+  renderPage: (pageNumber: number, scale?: number) => Promise<string | null>;
+  isActive?: boolean;
+  onClick?: () => void;
+}
+
+// =============================================================================
+// Page Renderer Component
+// =============================================================================
 
 const PageRendererComponent: React.FC<PageRendererProps> = ({
   pageNumber,
@@ -82,11 +103,10 @@ const PageRendererComponent: React.FC<PageRendererProps> = ({
         aspectRatio: !height ? '3/4' : undefined,
       }}
     >
-      {/* Page content */}
-      {isLoading && (
-        <PageSkeleton className="absolute inset-0 w-full h-full" />
-      )}
+      {/* Loading state */}
+      {isLoading && <PageSkeleton className="absolute inset-0 w-full h-full" />}
 
+      {/* Rendered image */}
       {renderedImage && !isLoading && (
         <img
           src={renderedImage}
@@ -98,6 +118,7 @@ const PageRendererComponent: React.FC<PageRendererProps> = ({
         />
       )}
 
+      {/* Error state */}
       {hasError && !isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-slate-800/50">
           <p className="text-slate-400 text-sm">خطا در بارگذاری صفحه {pageNumber}</p>
@@ -105,8 +126,7 @@ const PageRendererComponent: React.FC<PageRendererProps> = ({
       )}
 
       {/* Page number badge */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 
-                      px-2 py-1 rounded bg-black/50 text-xs text-white/70">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-black/50 text-xs text-white/70">
         {pageNumber}
       </div>
 
@@ -127,16 +147,13 @@ export const PageRenderer = memo(PageRendererComponent, (prevProps, nextProps) =
   );
 });
 
-// Thumbnail component
-interface ThumbnailProps {
-  pageNumber: number;
-  imageUrl: string | null;
-  renderPage: (pageNumber: number, scale?: number) => Promise<string | null>;
-  isActive?: boolean;
-  onClick?: () => void;
-}
+PageRenderer.displayName = 'PageRenderer';
 
-export const PageThumbnail: React.FC<ThumbnailProps> = memo(({
+// =============================================================================
+// Page Thumbnail Component
+// =============================================================================
+
+const PageThumbnailComponent: React.FC<PageThumbnailProps> = ({
   pageNumber,
   imageUrl,
   renderPage,
@@ -168,10 +185,7 @@ export const PageThumbnail: React.FC<ThumbnailProps> = memo(({
   }, [pageNumber, imageUrl, renderPage]);
 
   return (
-    <button
-      onClick={onClick}
-      className={`thumbnail-item ${isActive ? 'active' : ''}`}
-    >
+    <button onClick={onClick} className={`thumbnail-item ${isActive ? 'active' : ''}`}>
       {isLoading ? (
         <div className="w-full h-full skeleton" />
       ) : thumbnail ? (
@@ -186,16 +200,14 @@ export const PageThumbnail: React.FC<ThumbnailProps> = memo(({
           <span className="text-xs text-slate-400">{pageNumber}</span>
         </div>
       )}
-      
+
       {/* Active indicator */}
-      {isActive && (
-        <div className="absolute inset-0 border-2 border-primary-400 rounded-md" />
-      )}
+      {isActive && <div className="absolute inset-0 border-2 border-primary-400 rounded-md" />}
     </button>
   );
-});
+};
 
+export const PageThumbnail = memo(PageThumbnailComponent);
 PageThumbnail.displayName = 'PageThumbnail';
-PageRenderer.displayName = 'PageRenderer';
 
 export default PageRenderer;

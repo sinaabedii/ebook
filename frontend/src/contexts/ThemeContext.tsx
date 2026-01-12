@@ -1,42 +1,56 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+/**
+ * Theme Context
+ * Provides theme management (light/dark mode) throughout the application
+ */
 
-type Theme = 'light' | 'dark';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
+import { STORAGE_KEYS, DEFAULT_THEME, SUPPORTED_THEMES, type SupportedTheme } from '@/lib/constants';
+import { getStorageItem, setStorageItem, isBrowser } from '@/lib/utils';
+
+// =============================================================================
+// Types
+// =============================================================================
 
 interface ThemeContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
+  theme: SupportedTheme;
   isDark: boolean;
+  setTheme: (theme: SupportedTheme) => void;
+  toggleTheme: () => void;
 }
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
+// =============================================================================
+// Context
+// =============================================================================
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// =============================================================================
+// Provider Component
+// =============================================================================
+
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('dark'); // Default dark
+  const [theme, setThemeState] = useState<SupportedTheme>(DEFAULT_THEME);
   const [mounted, setMounted] = useState(false);
 
-  // Load theme from localStorage on mount
+  // Load theme from storage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+    const savedTheme = getStorageItem(STORAGE_KEYS.theme) as SupportedTheme | null;
+    if (savedTheme && SUPPORTED_THEMES.includes(savedTheme)) {
       setThemeState(savedTheme);
-    } else {
-      // Default to dark mode (app was built with dark mode first)
-      setThemeState('dark');
     }
     setMounted(true);
   }, []);
 
   // Apply theme to document
   useEffect(() => {
-    if (!mounted) return;
-    
+    if (!mounted || !isBrowser()) return;
+
     const root = document.documentElement;
-    
+
     if (theme === 'dark') {
       root.classList.add('dark');
       root.style.colorScheme = 'dark';
@@ -44,29 +58,41 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       root.classList.remove('dark');
       root.style.colorScheme = 'light';
     }
-    
-    localStorage.setItem('theme', theme);
+
+    setStorageItem(STORAGE_KEYS.theme, theme);
   }, [theme, mounted]);
 
-  const toggleTheme = () => {
-    setThemeState(prev => prev === 'light' ? 'dark' : 'light');
+  const setTheme = (newTheme: SupportedTheme) => {
+    if (SUPPORTED_THEMES.includes(newTheme)) {
+      setThemeState(newTheme);
+    }
   };
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
+  const toggleTheme = () => {
+    setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
+
+  const value = useMemo<ThemeContextType>(
+    () => ({
+      theme,
+      isDark: theme === 'dark',
+      setTheme,
+      toggleTheme,
+    }),
+    [theme]
+  );
 
   // Prevent flash of wrong theme
   if (!mounted) {
     return null;
   }
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, isDark: theme === 'dark' }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
+
+// =============================================================================
+// Hook
+// =============================================================================
 
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
