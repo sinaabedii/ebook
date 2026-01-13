@@ -11,7 +11,7 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html lang="fa" dir="rtl">
+    <Html lang="fa" dir="rtl" className="dark">
       <Head>
         {/* Font Preconnect */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

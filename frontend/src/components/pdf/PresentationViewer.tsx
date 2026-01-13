@@ -133,7 +133,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     goToSpread(spread);
   }, [totalPages, goToSpread]);
 
-  // Smooth realistic page flip animation
+  // Smooth realistic page flip animation - RTL book style
   const animateFlip = useCallback((direction: 'next' | 'prev') => {
     if (isFlipping) return;
     if (direction === 'next' && currentSpread >= totalSpreads - 1) return;
@@ -143,17 +143,29 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     setFlipDirection(direction);
     setFlipProgress(0);
 
-    const duration = 600;
+    const duration = 800; // Slower for more realistic feel
     const startTime = performance.now();
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const rawProgress = Math.min(elapsed / duration, 1);
       
-      // Smooth easing curve
-      const progress = rawProgress < 0.5
-        ? 4 * rawProgress * rawProgress * rawProgress
-        : 1 - Math.pow(-2 * rawProgress + 2, 3) / 2;
+      // Custom bezier-like easing for realistic book page feel
+      // Starts slow, accelerates in middle, slows at end
+      let progress: number;
+      if (rawProgress < 0.3) {
+        // Slow start - page lifting
+        progress = (rawProgress / 0.3) * 0.2;
+        progress = progress * progress * 0.2;
+      } else if (rawProgress < 0.7) {
+        // Fast middle - page turning
+        const midProgress = (rawProgress - 0.3) / 0.4;
+        progress = 0.2 + midProgress * 0.6;
+      } else {
+        // Slow end - page settling
+        const endProgress = (rawProgress - 0.7) / 0.3;
+        progress = 0.8 + (1 - Math.pow(1 - endProgress, 3)) * 0.2;
+      }
 
       setFlipProgress(progress);
 
@@ -178,7 +190,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
   const flipNext = useCallback(() => animateFlip('next'), [animateFlip]);
   const flipPrev = useCallback(() => animateFlip('prev'), [animateFlip]);
 
-  // Keyboard navigation
+  // Keyboard navigation - RTL direction (right arrow = next page, left arrow = prev page)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (showSearch) {
@@ -191,12 +203,12 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
       }
       
       switch (e.key) {
-        case 'ArrowLeft':
+        case 'ArrowRight':
         case 'ArrowUp':
           e.preventDefault();
           flipNext();
           break;
-        case 'ArrowRight':
+        case 'ArrowLeft':
         case 'ArrowDown':
           e.preventDefault();
           flipPrev();
@@ -229,7 +241,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [flipNext, flipPrev, onClose, isFullscreen, isHighlightMode, showSearch]);
 
-  // Touch handling
+  // Touch handling - RTL direction (swipe left = next, swipe right = prev)
   const touchStartX = useRef(0);
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isHighlightMode || showSearch) return;
@@ -239,7 +251,7 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
     if (isHighlightMode || showSearch) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
-      diff > 0 ? flipNext() : flipPrev();
+      diff < 0 ? flipNext() : flipPrev();
     }
   };
 
@@ -498,49 +510,193 @@ export const PresentationViewer: React.FC<PresentationViewerProps> = ({
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden shadow-lg">
             <img src="/logo/logo.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
-          <span className="text-white/80 font-medium text-sm sm:text-base hidden sm:block truncate max-w-[200px]">{bookTitle}</span>
+          <h1 className="text-white text-sm sm:text-base font-medium truncate max-w-[150px] sm:max-w-[250px]">
+            {bookTitle}
+          </h1>
         </div>
-
+        
         <div className="flex items-center gap-2">
           {/* Search */}
-          <button onClick={() => setShowSearch(true)} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20 transition-all" title="جستجوی صفحه (G)">
+          <button
+            onClick={() => setShowSearch(true)}
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+            title="جستجو (G)"
+          >
             <Search className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-
-          {/* Zoom */}
-          <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-1">
-            <button onClick={() => setZoomLevel(z => Math.max(z - 0.2, minZoom))} className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30" disabled={zoomLevel <= minZoom}>
-              <ZoomOut className="w-4 h-4" />
-            </button>
-            <span className="px-2 text-xs text-white/70 min-w-[40px] text-center">{Math.round(zoomLevel * 100)}%</span>
-            <button onClick={() => setZoomLevel(z => Math.min(z + 0.2, maxZoom))} className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-30" disabled={zoomLevel >= maxZoom}>
-              <ZoomIn className="w-4 h-4" />
-            </button>
-          </div>
-
+          
           {/* Highlight */}
-          <button onClick={() => setIsHighlightMode(!isHighlightMode)} className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all ${isHighlightMode ? 'text-white shadow-lg' : 'bg-white/10 text-white/70 hover:text-white hover:bg-white/20'}`} style={isHighlightMode ? { backgroundColor: '#5c0025' } : {}}>
+          <button
+            onClick={() => setIsHighlightMode(!isHighlightMode)}
+            className={`p-2 rounded-lg transition-colors ${
+              isHighlightMode ? 'bg-[#5c0025] text-white' : 'bg-white/10 hover:bg-white/20 text-white'
+            }`}
+            title="هایلایت"
+          >
             <Highlighter className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-
+          
+          {/* Zoom Out */}
+          <button
+            onClick={() => setZoomLevel(z => Math.max(z - 0.1, minZoom))}
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+            disabled={zoomLevel <= minZoom}
+          >
+            <ZoomOut className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+          
+          {/* Zoom In */}
+          <button
+            onClick={() => setZoomLevel(z => Math.min(z + 0.1, maxZoom))}
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+            disabled={zoomLevel >= maxZoom}
+          >
+            <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+          
           {/* Fullscreen */}
-          <button onClick={toggleFullscreen} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/20">
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
             {isFullscreen ? <Minimize className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />}
           </button>
-
+          
           {/* Close */}
-          <button onClick={onClose} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-red-500/50">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+          >
             <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
 
-      {/* Highlight Colors */}
+      {/* Highlight Color Picker */}
       {isHighlightMode && (
-        <div className="absolute top-16 sm:top-20 right-4 z-50 flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-3 py-2">
-          <span className="text-white/60 text-xs ml-2">رنگ:</span>
+        <div className="absolute top-16 right-4 z-50 flex gap-2 p-2 bg-black/50 rounded-lg backdrop-blur-sm">
           {highlightColors.map((c) => (
-            <button key={c.color} onClick={() => setHighlightColor(c.color)} className={`w-6 h-6 rounded-full border-2 transition-all ${highlightColor === c.color ? 'border-white scale-110' : 'border-transparent'}`} style={{ backgroundColor: c.color.replace(/0\.[34]/, '0.8') }} />
+            <button
+              key={c.name}
+              onClick={() => setHighlightColor(c.color)}
+              className={`w-6 h-6 rounded-full border-2 transition-transform ${
+                highlightColor === c.color ? 'border-white scale-110' : 'border-transparent'
+              }`}
+              style={{ backgroundColor: c.color }}
+              title={c.name}
+            />
           ))}
         </div>
       )}
+
+      {/* Book Container */}
+      <div className="flex-1 flex items-center justify-center overflow-auto p-4">
+        <div 
+          className="relative flex"
+          style={{ 
+            width: pageDimensions.bookWidth,
+            perspective: '2500px',
+          }}
+        >
+          {/* Book Shadow */}
+          <div 
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[90%] h-8 rounded-[50%] blur-xl"
+            style={{ background: 'rgba(0,0,0,0.4)' }}
+          />
+          
+          {/* Book Spine */}
+          <div 
+            className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-5 z-30"
+            style={{
+              background: 'linear-gradient(90deg, #2a2a2a 0%, #4a4a4a 20%, #3a3a3a 50%, #4a4a4a 80%, #2a2a2a 100%)',
+              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)',
+            }}
+          />
+
+          {/* Left Page */}
+          <div className="relative" style={{ marginRight: isMobile ? '8px' : '14px' }}>
+            {renderPage(leftPageNum, 'left')}
+          </div>
+
+          {/* Right Page */}
+          <div className="relative">
+            {renderPage(rightPageNum, 'right')}
+          </div>
+
+          {/* Flipping Page Animation */}
+          {renderFlippingPage()}
+
+          {/* Navigation Arrows */}
+          {currentSpread < totalSpreads - 1 && (
+            <button
+              onClick={flipNext}
+              disabled={isFlipping}
+              className="absolute -left-12 sm:-left-16 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all disabled:opacity-50"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          )}
+          
+          {currentSpread > 0 && (
+            <button
+              onClick={flipPrev}
+              disabled={isFlipping}
+              className="absolute -right-12 sm:-right-16 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all disabled:opacity-50"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="absolute bottom-0 left-0 right-0 z-50 p-3 sm:p-4">
+        <div className="flex items-center justify-center gap-4">
+          <span className="text-white/70 text-sm">
+            صفحه {leftPageNum}{rightPageNum <= totalPages ? ` - ${rightPageNum}` : ''} از {totalPages}
+          </span>
+        </div>
+      </div>
+
+      {/* Search Modal */}
+      {showSearch && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-xl p-4 w-[90%] max-w-sm">
+            <form onSubmit={handleSearch} className="flex flex-col gap-3">
+              <label className="text-white text-sm">برو به صفحه:</label>
+              <input
+                ref={searchInputRef}
+                type="number"
+                min={1}
+                max={totalPages}
+                value={searchPage}
+                onChange={(e) => setSearchPage(e.target.value)}
+                placeholder={`1 - ${totalPages}`}
+                className="px-3 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:border-[#5c0025] outline-none"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  className="flex-1 py-2 rounded-lg bg-[#5c0025] text-white hover:bg-[#7a0033] transition-colors"
+                >
+                  برو
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSearch(false)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors"
+                >
+                  انصراف
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  if (!mounted) return null;
+
+  return createPortal(content, document.body);
+};

@@ -61,7 +61,7 @@ export default function HomePage() {
             <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
               {/* Content */}
               <div className={`flex-1 text-center ${language === 'fa' ? 'lg:text-right' : 'lg:text-left'}`}>
-                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm mb-4 sm:mb-6 animate-bounce-soft" style={{ backgroundColor: 'rgba(92, 0, 37, 0.15)', border: '1px solid rgba(92, 0, 37, 0.25)', color: '#5c0025' }}>
+                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm mb-4 sm:mb-6 animate-bounce-soft" style={{ backgroundColor: 'rgba(242, 119, 148, 0.15)', border: '1px solid rgba(242, 119, 148, 0.3)', color: '#f27794' }}>
                   <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{t('home.badge')}</span>
                 </div>
@@ -91,18 +91,18 @@ export default function HomePage() {
                 {/* Stats - Hidden on mobile */}
                 <div className="hidden sm:flex items-center justify-center lg:justify-start gap-6 lg:gap-8 mt-8 lg:mt-10 pt-8 lg:pt-10" style={{ borderTop: '1px solid var(--border-color)' }}>
                   <div className="text-center animate-fade-in-up delay-100">
-                    <p className="text-2xl lg:text-3xl font-bold text-gradient">{language === 'fa' ? '۱۰۰+' : '100+'}</p>
-                    <p className="text-xs lg:text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('common.books')}</p>
+                    <p className="text-2xl lg:text-3xl font-bold" style={{ color: '#f27794' }}>{language === 'fa' ? '۱۰۰+' : '100+'}</p>
+                    <p className="text-xs lg:text-sm" style={{ color: 'var(--text-secondary)' }}>{t('common.books')}</p>
                   </div>
                   <div className="w-px h-10 lg:h-12" style={{ backgroundColor: 'var(--border-color)' }} />
                   <div className="text-center animate-fade-in-up delay-200">
-                    <p className="text-2xl lg:text-3xl font-bold text-gradient">{language === 'fa' ? '۵۰+' : '50+'}</p>
-                    <p className="text-xs lg:text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('common.users')}</p>
+                    <p className="text-2xl lg:text-3xl font-bold" style={{ color: '#f27794' }}>{language === 'fa' ? '۵۰+' : '50+'}</p>
+                    <p className="text-xs lg:text-sm" style={{ color: 'var(--text-secondary)' }}>{t('common.books')}</p>
                   </div>
                   <div className="w-px h-10 lg:h-12" style={{ backgroundColor: 'var(--border-color)' }} />
                   <div className="text-center animate-fade-in-up delay-300">
-                    <p className="text-2xl lg:text-3xl font-bold text-gradient">{language === 'fa' ? '۴.۹' : '4.9'}</p>
-                    <p className="text-xs lg:text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('common.rating')}</p>
+                    <p className="text-2xl lg:text-3xl font-bold" style={{ color: '#f27794' }}>{language === 'fa' ? '۴.۹' : '4.9'}</p>
+                    <p className="text-xs lg:text-sm" style={{ color: 'var(--text-secondary)' }}>{t('common.rating')}</p>
                   </div>
                 </div>
               </div>

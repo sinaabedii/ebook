@@ -64,9 +64,9 @@ export default function ViewerPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-surface-900 to-surface-950">
+      <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: 'linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)' }}>
         <BookLoadingSpinner />
-        <p className="text-surface-400 mt-4 text-sm">در حال بارگذاری کتاب...</p>
+        <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>در حال بارگذاری کتاب...</p>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export default function ViewerPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-surface-900 to-surface-950 p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)' }}>
         <ErrorMessage
           title="خطا در بارگذاری کتاب"
           message={error}
@@ -87,14 +87,14 @@ export default function ViewerPage() {
   // Book not found
   if (!book) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-surface-900 to-surface-950 p-4">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)' }}>
         <div className="text-center">
-          <BookOpen className="w-16 h-16 text-surface-600 mx-auto mb-4" />
-          <h2 className="text-xl font-medium text-white mb-2">کتاب یافت نشد</h2>
-          <p className="text-surface-400 mb-6">این کتاب وجود ندارد یا حذف شده است</p>
+          <BookOpen className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
+          <h2 className="text-xl font-medium mb-2" style={{ color: 'var(--text-primary)' }}>کتاب یافت نشد</h2>
+          <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>این کتاب وجود ندارد یا حذف شده است</p>
           <button
             onClick={handleGoBack}
-            className="px-6 py-3 rounded-xl text-white font-medium transition-colors"
+            className="px-6 py-3 rounded-xl text-white font-medium transition-colors hover-lift"
             style={{ backgroundColor: '#5c0025' }}
           >
             بازگشت به کتابخانه

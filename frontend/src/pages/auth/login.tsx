@@ -53,6 +53,21 @@ export default function LoginPage() {
     return `${digits.slice(0, 4)} ${digits.slice(4, 7)} ${digits.slice(7, 11)}`;
   };
 
+  // Get localized error message
+  const getErrorMessage = (key: string) => {
+    const messages: Record<string, Record<string, string>> = {
+      fa: {
+        invalidPhone: 'شماره موبایل باید ۱۱ رقم و با ۰۹ شروع شود',
+        invalidOtp: 'لطفاً کد ۶ رقمی را وارد کنید',
+      },
+      en: {
+        invalidPhone: 'Phone number must be 11 digits starting with 09',
+        invalidOtp: 'Please enter a 6-digit code',
+      },
+    };
+    return messages[language]?.[key] || messages.fa[key];
+  };
+
   // Handle phone input
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const digits = e.target.value.replace(/\D/g, '');
@@ -103,7 +118,7 @@ export default function LoginPage() {
     setSuccess('');
     
     if (phone.length !== 11 || !phone.startsWith('09')) {
-      setError('شماره موبایل باید ۱۱ رقم و با ۰۹ شروع شود');
+      setError(getErrorMessage('invalidPhone'));
       return;
     }
     
@@ -136,7 +151,7 @@ export default function LoginPage() {
     
     const code = otp.join('');
     if (code.length !== 6) {
-      setError('لطفاً کد ۶ رقمی را وارد کنید');
+      setError(getErrorMessage('invalidOtp'));
       return;
     }
     
@@ -243,7 +258,7 @@ export default function LoginPage() {
             {/* Debug Code (Development Only) */}
             {debugCode && step === 'otp' && (
               <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-                <p className="text-xs font-medium mb-1 text-yellow-400">کد تایید (حالت توسعه):</p>
+                <p className="text-xs font-medium mb-1 text-yellow-400">{t('auth.debugCode')}</p>
                 <p className="text-2xl font-mono font-bold tracking-widest text-yellow-300">{debugCode}</p>
               </div>
             )}
@@ -253,16 +268,16 @@ export default function LoginPage() {
               <form onSubmit={handleRequestOtp} className="animate-fade-in-up">
                 <div className="mb-6">
                   <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                    شماره موبایل
+                    {t('auth.phoneNumber')}
                   </label>
                   <div className="relative group">
-                    <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors" style={{ color: 'var(--text-tertiary)' }} />
+                    <Phone className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-5 h-5 transition-colors`} style={{ color: 'var(--text-tertiary)' }} />
                     <input
                       type="tel"
                       value={formatPhone(phone)}
                       onChange={handlePhoneChange}
-                      placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
-                      className="input pr-10 text-left"
+                      placeholder={t('auth.phonePlaceholder')}
+                      className={`input ${isRTL ? 'pr-10' : 'pl-10'} text-left`}
                       dir="ltr"
                       autoFocus
                     />
@@ -277,10 +292,10 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      در حال ارسال...
+                      {t('auth.sending')}
                     </>
                   ) : (
-                    'دریافت کد تایید'
+                    t('auth.getCode')
                   )}
                 </button>
               </form>
@@ -291,7 +306,7 @@ export default function LoginPage() {
               <form onSubmit={handleVerifyOtp} className="animate-fade-in-up">
                 <div className="mb-6">
                   <label className="block text-sm font-medium mb-4 text-center" style={{ color: 'var(--text-secondary)' }}>
-                    کد ۶ رقمی ارسال شده به {formatPhone(phone)}
+                    {t('auth.verifyCode')} {formatPhone(phone)}
                   </label>
                   
                   <div className="flex gap-1.5 sm:gap-2 justify-center" dir="ltr">
@@ -328,17 +343,17 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      در حال بررسی...
+                      {t('auth.checking')}
                     </>
                   ) : (
-                    'تایید و ورود'
+                    t('auth.verifyAndLogin')
                   )}
                 </button>
 
                 <div className="mt-4 text-center">
                   {countdown > 0 ? (
-                    <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-                      ارسال مجدد کد تا {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      {t('auth.resendIn')} {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
                     </p>
                   ) : (
                     <button
@@ -347,7 +362,7 @@ export default function LoginPage() {
                       className="text-sm transition-colors hover-scale"
                       style={{ color: '#f27794' }}
                     >
-                      ارسال مجدد کد
+                      {t('auth.resendCode')}
                     </button>
                   )}
                 </div>
@@ -359,7 +374,7 @@ export default function LoginPage() {
                   style={{ color: 'var(--text-secondary)' }}
                 >
                   <ArrowRight className="w-4 h-4" />
-                  تغییر شماره موبایل
+                  {t('auth.changeNumber')}
                 </button>
               </form>
             )}
@@ -370,13 +385,13 @@ export default function LoginPage() {
                 <div className="space-y-4 mb-6">
                   <div className="animate-slide-in-right" style={{ animationDelay: '100ms' }}>
                     <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                      نام
+                      {t('auth.firstName')}
                     </label>
                     <input
                       type="text"
                       value={firstName}
                       onChange={e => setFirstName(e.target.value)}
-                      placeholder="نام خود را وارد کنید"
+                      placeholder={t('auth.firstNamePlaceholder')}
                       className="input"
                       autoFocus
                     />
@@ -384,26 +399,26 @@ export default function LoginPage() {
 
                   <div className="animate-slide-in-right" style={{ animationDelay: '200ms' }}>
                     <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                      نام خانوادگی
+                      {t('auth.lastName')}
                     </label>
                     <input
                       type="text"
                       value={lastName}
                       onChange={e => setLastName(e.target.value)}
-                      placeholder="نام خانوادگی خود را وارد کنید"
+                      placeholder={t('auth.lastNamePlaceholder')}
                       className="input"
                     />
                   </div>
 
                   <div className="animate-slide-in-right" style={{ animationDelay: '300ms' }}>
                     <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-                      کد سازمان (اختیاری)
+                      {t('auth.orgCode')}
                     </label>
                     <input
                       type="text"
                       value={organizationCode}
                       onChange={e => setOrganizationCode(e.target.value)}
-                      placeholder="در صورت عضویت در سازمان، کد را وارد کنید"
+                      placeholder={t('auth.orgCodePlaceholder')}
                       className="input"
                       dir="ltr"
                     />
@@ -418,10 +433,10 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      در حال ثبت‌نام...
+                      {t('auth.registering')}
                     </>
                   ) : (
-                    'تکمیل ثبت‌نام'
+                    t('auth.completeRegister')
                   )}
                 </button>
 
@@ -432,15 +447,15 @@ export default function LoginPage() {
                   style={{ color: 'var(--text-secondary)' }}
                 >
                   <ArrowRight className="w-4 h-4" />
-                  بازگشت
+                  {t('auth.back')}
                 </button>
               </form>
             )}
           </div>
 
           {/* Footer */}
-          <p className="text-center text-sm mt-6" style={{ color: 'var(--text-tertiary)' }}>
-            با ورود به سامانه، <Link href="/terms" className="transition-colors" style={{ color: '#f27794' }}>قوانین و مقررات</Link> را می‌پذیرید
+          <p className="text-center text-sm mt-6" style={{ color: 'var(--text-secondary)' }}>
+            {t('auth.termsText')} <Link href="/terms" className="transition-colors" style={{ color: '#f27794' }}>{t('auth.termsLink')}</Link> {t('auth.termsAccept')}
           </p>
         </div>
       </div>

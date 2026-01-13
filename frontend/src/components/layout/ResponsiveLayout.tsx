@@ -175,15 +175,15 @@ export const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                   <img src="/logo/logo.png" alt="Logo" className="w-full h-full object-cover" />
                 </div>
                 {!isMobile && (
-                  <span className="text-lg font-bold text-gradient">
+                  <span className="text-lg font-bold" style={{ color: '#f27794' }}>
                     {t('home.title')}
                   </span>
                 )}
               </Link>
             </div>
 
-            {/* Center - Title */}
-            {title && (
+            {/* Center - Title (only show when nav is hidden or on mobile) */}
+            {title && (!showNav || isMobile) && (
               <h1
                 className="absolute left-1/2 -translate-x-1/2 font-semibold truncate max-w-[200px] sm:max-w-none"
                 style={{ color: 'var(--text-primary)' }}

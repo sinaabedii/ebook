@@ -6,10 +6,12 @@ import {
   Menu, X, Upload, Library, Home 
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts';
 
 export default function Header() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -32,13 +34,13 @@ export default function Header() {
   };
 
   const navLinks = [
-    { href: '/', label: 'خانه', icon: Home },
-    { href: '/library', label: 'کتابخانه', icon: Library },
-    { href: '/upload', label: 'آپلود', icon: Upload },
+    { href: '/', label: t('nav.home'), icon: Home },
+    { href: '/library', label: t('nav.library'), icon: Library },
+    { href: '/upload', label: t('nav.upload'), icon: Upload },
   ];
 
   return (
-    <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--bg-card)', borderBottom: '1px solid var(--border-color)' }} dir="rtl">
+    <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--bg-card)', borderBottom: '1px solid var(--border-color)' }} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -47,7 +49,7 @@ export default function Header() {
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl font-bold hidden sm:block" style={{ color: 'var(--text-primary)' }}>
-              ArianDoc
+              {t('home.title')}
             </span>
           </Link>
 
@@ -107,7 +109,7 @@ export default function Header() {
                   <div className="absolute left-0 mt-2 w-56 rounded-lg shadow-lg py-1 z-50" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                     <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border-color)' }}>
                       <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-                        {user.full_name || user.first_name || 'کاربر'}
+                        {user.full_name || user.first_name || t('profile.user')}
                       </p>
                       <p className="text-xs mt-0.5 ltr" dir="ltr" style={{ color: 'var(--text-tertiary)' }}>
                         {user.phone}
@@ -121,7 +123,7 @@ export default function Header() {
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <User className="w-4 h-4" />
-                      پروفایل
+                      {t('nav.profile')}
                     </Link>
                     
                     <Link
@@ -131,7 +133,7 @@ export default function Header() {
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <Settings className="w-4 h-4" />
-                      تنظیمات
+                      {t('common.settings')}
                     </Link>
                     
                     <hr style={{ borderColor: 'var(--border-color)', margin: '4px 0' }} />
@@ -141,7 +143,7 @@ export default function Header() {
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 w-full transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
-                      خروج
+                      {t('nav.logout')}
                     </button>
                   </div>
                 )}
@@ -153,8 +155,8 @@ export default function Header() {
                 style={{ backgroundColor: '#5c0025' }}
               >
                 <User className="w-4 h-4" />
-                <span className="hidden sm:inline">ورود / ثبت‌نام</span>
-                <span className="sm:hidden">ورود</span>
+                <span className="hidden sm:inline">{t('nav.login')} / {t('nav.register')}</span>
+                <span className="sm:hidden">{t('nav.login')}</span>
               </Link>
             )}
 

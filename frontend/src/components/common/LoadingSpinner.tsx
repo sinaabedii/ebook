@@ -51,13 +51,13 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   return (
     <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
       <div className="relative">
-        <div className={`${sizeClasses[size]} rounded-full border-4 border-slate-700 animate-pulse`} />
+        <div className={`${sizeClasses[size]} rounded-full border-4 animate-pulse`} style={{ borderColor: 'var(--border-color)' }} />
         <div
           className={`${sizeClasses[size]} absolute top-0 left-0 rounded-full border-4 border-transparent animate-spin`}
           style={{ borderTopColor: '#5c0025' }}
         />
       </div>
-      {text && <span className="text-sm text-slate-400 animate-pulse">{text}</span>}
+      {text && <span className="text-sm animate-pulse" style={{ color: 'var(--text-secondary)' }}>{text}</span>}
     </div>
   );
 };
@@ -76,7 +76,7 @@ export const BookLoadingSpinner: React.FC<SkeletonProps> = ({ className = '' }) 
           <div className="absolute left-0 top-0 bottom-0 w-2 rounded-l-sm" style={{ backgroundColor: '#3d0018' }} />
           {/* Pages animation */}
           <div className="absolute right-1 top-1 bottom-1 left-3 rounded-r-sm overflow-hidden" style={{ backgroundColor: '#fef1f3' }}>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-300/50 to-transparent animate-pulse" />
+            <div className="absolute inset-0 animate-pulse" style={{ background: 'linear-gradient(to bottom, transparent, rgba(92, 0, 37, 0.1), transparent)' }} />
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
@@ -92,7 +92,7 @@ export const BookLoadingSpinner: React.FC<SkeletonProps> = ({ className = '' }) 
           style={{ animationDuration: '1.5s', backgroundColor: '#fef1f3' }}
         />
       </div>
-      <span className="text-slate-400 text-sm animate-pulse">در حال بارگذاری کتاب...</span>
+      <span className="text-sm animate-pulse" style={{ color: 'var(--text-secondary)' }}>در حال بارگذاری کتاب...</span>
     </div>
   );
 };
@@ -112,7 +112,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className={`w-full ${className}`}>
       {(label || showPercentage) && (
-        <div className="flex justify-between mb-2 text-sm text-slate-400">
+        <div className="flex justify-between mb-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
           {label && <span>{label}</span>}
           {showPercentage && <span>{Math.round(clampedProgress)}%</span>}
         </div>
@@ -153,8 +153,8 @@ export const PageSkeleton: React.FC<SkeletonProps> = ({ className = '' }) => {
         {[...Array(12)].map((_, i) => (
           <div
             key={i}
-            className="h-3 bg-slate-600/30 rounded mb-3"
-            style={{ width: `${70 + Math.random() * 25}%` }}
+            className="h-3 rounded mb-3"
+            style={{ width: `${70 + Math.random() * 25}%`, backgroundColor: 'var(--bg-tertiary)' }}
           />
         ))}
       </div>

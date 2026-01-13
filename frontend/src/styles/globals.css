@@ -18,15 +18,15 @@
     --brand-300: #f8a9ba;
     --brand-400: #f27794;
     
-    /* Default is Dark Mode (since the app was built with dark first) */
-    --bg-primary: #09090b;
-    --bg-secondary: #18181b;
-    --bg-tertiary: #27272a;
-    --bg-card: #18181b;
-    --text-primary: #fafafa;
-    --text-secondary: #a1a1aa;
-    --text-tertiary: #71717a;
-    --border-color: #27272a;
+    /* Dark Mode Colors (Default) - IMPROVED CONTRAST */
+    --bg-primary: #0f0f12;
+    --bg-secondary: #1a1a1f;
+    --bg-tertiary: #2a2a32;
+    --bg-card: #1a1a1f;
+    --text-primary: #ffffff;
+    --text-secondary: #d0d0d8;
+    --text-tertiary: #a8a8b8;
+    --border-color: #3a3a48;
     
     /* Book Variables - Updated with brand colors */
     --book-cover: #5c0025;
@@ -87,11 +87,11 @@
 
   /* Dark mode body gradient */
   html.dark body {
-    background-color: #050506;
+    background-color: #0a0a0d;
     background-image: 
-      radial-gradient(ellipse 100% 80% at 50% -30%, rgba(92, 0, 37, 0.25), transparent),
-      radial-gradient(ellipse 80% 50% at 100% 50%, rgba(92, 0, 37, 0.12), transparent),
-      radial-gradient(ellipse 60% 40% at 0% 80%, rgba(138, 25, 69, 0.1), transparent);
+      radial-gradient(ellipse 100% 80% at 50% -30%, rgba(92, 0, 37, 0.2), transparent),
+      radial-gradient(ellipse 80% 50% at 100% 50%, rgba(92, 0, 37, 0.1), transparent),
+      radial-gradient(ellipse 60% 40% at 0% 80%, rgba(138, 25, 69, 0.08), transparent);
   }
 
   /* Light mode body gradient */
@@ -391,7 +391,7 @@
   }
   
   html.dark .skeleton-shimmer {
-    background: linear-gradient(90deg, #27272a 0%, #3f3f46 50%, #27272a 100%);
+    background: linear-gradient(90deg, #2a2a32 0%, #3a3a45 50%, #2a2a32 100%);
   }
   
   html:not(.dark) .skeleton-shimmer {
@@ -881,7 +881,7 @@
   /* Custom Scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #3f3f46 #18181b;
+    scrollbar-color: #4a4a55 #1a1a1f;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -890,12 +890,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #3f3f46;
+    background-color: #4a4a55;
     border-radius: 9999px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-track {
-    background-color: #09090b;
+    background-color: #0f0f12;
   }
 
   /* Hide Scrollbar */
@@ -1023,7 +1023,7 @@ html:not(.dark) .hover-glow:hover {
 
 /* ===== Gradient Text ===== */
 .text-gradient {
-  background: linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%);
+  background: linear-gradient(135deg, #f27794 0%, #e85a7a 50%, #d64060 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1082,11 +1082,11 @@ html:not(.dark) .border-animated:hover {
 }
 
 html.dark .glass-premium {
-  background: rgba(24, 24, 27, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(26, 26, 31, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 
     0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 html:not(.dark) .glass-premium {

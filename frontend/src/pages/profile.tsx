@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { ResponsiveLayout } from '@/components/layout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts';
 import { authApi, handleApiError } from '@/api/djangoApi';
 import { 
   User, Mail, Phone, Building2, Shield, Calendar,
@@ -12,6 +13,7 @@ import {
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading, refreshUser } = useAuth();
+  const { t, language, isRTL } = useLanguage();
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -60,7 +62,7 @@ export default function ProfilePage() {
     try {
       await authApi.updateProfile(formData);
       await refreshUser();
-      setSuccess('اطلاعات با موفقیت بروزرسانی شد');
+      setSuccess(t('profile.updateSuccess'));
       setIsEditing(false);
     } catch (err) {
       setError(handleApiError(err));
@@ -83,13 +85,9 @@ export default function ProfilePage() {
   };
 
   const getRoleName = (role: string) => {
-    const roles: Record<string, string> = {
-      admin: 'مدیر سیستم',
-      org_admin: 'مدیر سازمان',
-      manager: 'مدیر',
-      member: 'کاربر عادی',
-    };
-    return roles[role] || role;
+    const roleKey = `profile.roles.${role}`;
+    const translated = t(roleKey);
+    return translated !== roleKey ? translated : role;
   };
 
   if (authLoading) {
@@ -107,11 +105,11 @@ export default function ProfilePage() {
   return (
     <>
       <Head>
-        <title>پروفایل | ArianDoc</title>
+        <title>{t('profile.title')} | {t('home.title')}</title>
       </Head>
 
-      <ResponsiveLayout title="پروفایل" showBackButton>
-        <div className="max-w-2xl mx-auto">
+      <ResponsiveLayout title={t('profile.title')} showBackButton>
+        <div className="max-w-2xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Header Card */}
           <div className="card p-6 mb-6 animate-fade-in-up hover-lift">
             <div className="flex items-center gap-5">
@@ -124,7 +122,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex-1">
                 <h1 className="text-xl font-bold text-gradient mb-1">
-                  {user.full_name || user.first_name || 'کاربر'}
+                  {user.full_name || user.first_name || t('profile.user')}
                 </h1>
                 <p className="ltr text-sm" dir="ltr" style={{ color: 'var(--text-secondary)' }}>{user.phone}</p>
                 {user.organization_name && (
@@ -136,7 +134,7 @@ export default function ProfilePage() {
               </div>
               <div className="badge-success pulse-ring">
                 <Sparkles className="w-3.5 h-3.5" />
-                فعال
+                {t('profile.active')}
               </div>
             </div>
           </div>
@@ -158,14 +156,14 @@ export default function ProfilePage() {
           {/* Profile Form */}
           <div className="card p-6 animate-fade-in-up delay-100">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gradient">اطلاعات شخصی</h2>
+              <h2 className="text-lg font-semibold text-gradient">{t('profile.personalInfo')}</h2>
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="btn-ghost text-sm hover-scale"
                 >
                   <Edit2 className="w-4 h-4" />
-                  ویرایش
+                  {t('profile.edit')}
                 </button>
               )}
             </div>
@@ -175,7 +173,7 @@ export default function ProfilePage() {
                 {/* Name Fields */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>نام</label>
+                    <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>{t('profile.firstName')}</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -183,14 +181,14 @@ export default function ProfilePage() {
                         value={formData.first_name}
                         onChange={handleChange}
                         className="input"
-                        placeholder="نام خود را وارد کنید"
+                        placeholder={t('profile.firstNamePlaceholder')}
                       />
                     ) : (
                       <p className="py-3" style={{ color: 'var(--text-primary)' }}>{user.first_name || '-'}</p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>نام خانوادگی</label>
+                    <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>{t('profile.lastName')}</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -198,7 +196,7 @@ export default function ProfilePage() {
                         value={formData.last_name}
                         onChange={handleChange}
                         className="input"
-                        placeholder="نام خانوادگی خود را وارد کنید"
+                        placeholder={t('profile.lastNamePlaceholder')}
                       />
                     ) : (
                       <p className="py-3" style={{ color: 'var(--text-primary)' }}>{user.last_name || '-'}</p>
@@ -208,7 +206,7 @@ export default function ProfilePage() {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>ایمیل</label>
+                  <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>{t('profile.email')}</label>
                   {isEditing ? (
                     <input
                       type="email"
@@ -217,7 +215,7 @@ export default function ProfilePage() {
                       onChange={handleChange}
                       className="input text-left"
                       dir="ltr"
-                      placeholder="email@example.com"
+                      placeholder={t('profile.emailPlaceholder')}
                     />
                   ) : (
                     <p className="py-3 ltr" dir="ltr" style={{ color: 'var(--text-primary)' }}>{user.email || '-'}</p>
@@ -226,7 +224,7 @@ export default function ProfilePage() {
 
                 {/* National ID */}
                 <div>
-                  <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>کد ملی</label>
+                  <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>{t('profile.nationalId')}</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -236,7 +234,7 @@ export default function ProfilePage() {
                       maxLength={10}
                       className="input text-left"
                       dir="ltr"
-                      placeholder="۱۲۳۴۵۶۷۸۹۰"
+                      placeholder={t('profile.nationalIdPlaceholder')}
                     />
                   ) : (
                     <p className="py-3 ltr" dir="ltr" style={{ color: 'var(--text-primary)' }}>{user.national_id || '-'}</p>
@@ -250,7 +248,7 @@ export default function ProfilePage() {
                       <Phone className="w-4 h-4" style={{ color: '#f27794' }} />
                     </div>
                     <div>
-                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>شماره موبایل</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{t('profile.phone')}</p>
                       <p className="text-sm ltr" dir="ltr" style={{ color: 'var(--text-primary)' }}>{user.phone}</p>
                     </div>
                   </div>
@@ -259,7 +257,7 @@ export default function ProfilePage() {
                       <Shield className="w-4 h-4" style={{ color: '#f27794' }} />
                     </div>
                     <div>
-                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>نقش</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{t('profile.role')}</p>
                       <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{getRoleName(user.role)}</p>
                     </div>
                   </div>
@@ -268,9 +266,9 @@ export default function ProfilePage() {
                       <Calendar className="w-4 h-4" style={{ color: '#f27794' }} />
                     </div>
                     <div>
-                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>تاریخ عضویت</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{t('profile.joinDate')}</p>
                       <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
-                        {new Date(user.date_joined).toLocaleDateString('fa-IR')}
+                        {new Date(user.date_joined).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US')}
                       </p>
                     </div>
                   </div>
@@ -287,12 +285,12 @@ export default function ProfilePage() {
                       {isSaving ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          در حال ذخیره...
+                          {t('profile.saving')}
                         </>
                       ) : (
                         <>
                           <Save className="w-4 h-4" />
-                          ذخیره تغییرات
+                          {t('profile.saveChanges')}
                         </>
                       )}
                     </button>
@@ -302,7 +300,7 @@ export default function ProfilePage() {
                       className="btn-secondary hover-lift"
                     >
                       <X className="w-4 h-4" />
-                      انصراف
+                      {t('profile.cancel')}
                     </button>
                   </div>
                 )}

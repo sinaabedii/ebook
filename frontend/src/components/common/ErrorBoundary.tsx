@@ -66,24 +66,24 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <AlertTriangle className="w-12 h-12 text-red-500" />
           </div>
 
-          <h2 className="text-xl font-semibold text-white mb-2">خطایی رخ داده است</h2>
+          <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>خطایی رخ داده است</h2>
 
-          <p className="text-slate-400 mb-6 max-w-md">
+          <p className="mb-6 max-w-md" style={{ color: 'var(--text-secondary)' }}>
             متأسفانه در بارگذاری این بخش مشکلی پیش آمده است. لطفاً دوباره تلاش کنید.
           </p>
 
           {process.env.NODE_ENV === 'development' && this.state.error && (
-            <div className="w-full max-w-lg mb-6 p-4 bg-slate-800/50 rounded-lg text-left overflow-auto">
+            <div className="w-full max-w-lg mb-6 p-4 rounded-lg text-left overflow-auto" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
               <p className="text-red-400 font-mono text-sm mb-2">{this.state.error.toString()}</p>
               {this.state.errorInfo && (
-                <pre className="text-slate-500 text-xs overflow-x-auto">
+                <pre className="text-xs overflow-x-auto" style={{ color: 'var(--text-tertiary)' }}>
                   {this.state.errorInfo.componentStack}
                 </pre>
               )}
             </div>
           )}
 
-          <button onClick={this.handleRetry} className="control-btn-primary flex items-center gap-2 px-6 py-3">
+          <button onClick={this.handleRetry} className="btn-primary flex items-center gap-2 px-6 py-3">
             <RefreshCw className="w-5 h-5" />
             <span>تلاش مجدد</span>
           </button>
@@ -108,10 +108,10 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   return (
     <div className={`flex flex-col items-center justify-center p-6 text-center ${className}`}>
       <AlertTriangle className="w-10 h-10 text-red-500 mb-4" />
-      <h3 className="text-lg font-medium text-white mb-2">{title}</h3>
-      <p className="text-slate-400 mb-4">{message}</p>
+      <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+      <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>{message}</p>
       {onRetry && (
-        <button onClick={onRetry} className="control-btn-primary flex items-center gap-2 px-4 py-2">
+        <button onClick={onRetry} className="btn-primary flex items-center gap-2 px-4 py-2">
           <RefreshCw className="w-4 h-4" />
           <span>تلاش مجدد</span>
         </button>
