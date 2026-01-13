@@ -53,11 +53,12 @@ export default function LibraryPage() {
       setTotalCount(response.count);
       setHasMore(!!response.next);
     } catch (err) {
-      setError(handleApiError(err));
+      const errorKey = handleApiError(err);
+      setError(errorKey.startsWith('errors.') ? t(errorKey) : errorKey);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchBooks(1);
@@ -75,11 +76,12 @@ export default function LibraryPage() {
       setBooks(results);
       setHasMore(false);
     } catch (err) {
-      setError(handleApiError(err));
+      const errorKey = handleApiError(err);
+      setError(errorKey.startsWith('errors.') ? t(errorKey) : errorKey);
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, fetchBooks]);
+  }, [searchQuery, fetchBooks, t]);
 
   const handleLoadMore = () => {
     if (!isLoading && hasMore) {
@@ -125,33 +127,32 @@ export default function LibraryPage() {
   return (
     <ResponsiveLayout>
       {/* Page Header */}
-      <div className="text-center mb-6 sm:mb-8 pt-4">
-        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl shadow-lg mb-3 sm:mb-4" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
+      <div className="text-center mb-6 sm:mb-8 pt-4 animate-fade-in-up">
+        <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl shadow-lg mb-3 sm:mb-4 hover-scale shine" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
           <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
         </div>
-        <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--text-primary)' }}>{t('library.title')}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2 text-gradient">{t('library.title')}</h1>
         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('common.yourLibrary')}</p>
       </div>
 
       {/* Header Controls */}
-      <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4">
+      <div className="mb-4 sm:mb-6 space-y-3 sm:space-y-4 animate-fade-in-up delay-100">
         {/* Search Bar */}
         <div className="flex gap-2 sm:gap-4">
-          <div className="flex-1 relative">
-            <Search className={`absolute ${language === 'fa' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5`} style={{ color: 'var(--text-tertiary)' }} />
+          <div className="flex-1 relative group">
+            <Search className={`absolute ${language === 'fa' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 transition-colors group-focus-within:text-brand-400`} style={{ color: 'var(--text-tertiary)' }} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('library.searchPlaceholder')}
-              className={`input w-full ${language === 'fa' ? 'pr-9 sm:pr-10 pl-3 sm:pl-4' : 'pl-9 sm:pl-10 pr-3 sm:pr-4'} py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base`}
+              className={`input w-full ${language === 'fa' ? 'pr-9 sm:pr-10 pl-3 sm:pl-4' : 'pl-9 sm:pl-10 pr-3 sm:pr-4'} py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base transition-all duration-300`}
             />
           </div>
           <button
             onClick={handleSearch}
-            className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white text-sm font-medium transition-colors"
-            style={{ backgroundColor: '#5c0025' }}
+            className="btn-primary px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-white text-sm font-medium hover-lift"
           >
             {t('common.search')}
           </button>
@@ -241,19 +242,22 @@ export default function LibraryPage() {
         <>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-              {sortedBooks.map((book) => (
-                <GridBookCard key={book.id} book={book} onDelete={handleDelete} />
+              {sortedBooks.map((book, index) => (
+                <div key={book.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+                  <GridBookCard book={book} onDelete={handleDelete} />
+                </div>
               ))}
             </div>
           ) : (
             <div className="space-y-4">
-              {sortedBooks.map((book) => (
-                <ListBookCard 
-                  key={book.id} 
-                  book={book} 
-                  onDelete={handleDelete}
-                  formatDate={formatDate}
-                />
+              {sortedBooks.map((book, index) => (
+                <div key={book.id} className="animate-slide-in-right" style={{ animationDelay: `${index * 50}ms` }}>
+                  <ListBookCard 
+                    book={book} 
+                    onDelete={handleDelete}
+                    formatDate={formatDate}
+                  />
+                </div>
               ))}
             </div>
           )}
@@ -272,9 +276,11 @@ export default function LibraryPage() {
           )}
         </>
       ) : (
-        <div className="card p-8 sm:p-12 rounded-xl sm:rounded-2xl text-center">
-          <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4" style={{ color: 'var(--text-tertiary)' }} />
-          <h3 className="text-lg sm:text-xl font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+        <div className="card p-8 sm:p-12 rounded-xl sm:rounded-2xl text-center animate-scale-in">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center shine" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))' }}>
+            <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 animate-bounce-soft" style={{ color: '#f27794' }} />
+          </div>
+          <h3 className="text-lg sm:text-xl font-medium mb-2 text-gradient">
             {searchQuery ? t('library.empty') : t('library.empty')}
           </h3>
           <p className="mb-6 text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>
@@ -284,8 +290,7 @@ export default function LibraryPage() {
           </p>
           <Link
             href="/upload"
-            className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white transition-colors text-sm sm:text-base font-medium"
-            style={{ backgroundColor: '#5c0025' }}
+            className="btn-primary inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-white text-sm sm:text-base font-medium hover-lift shine"
           >
             <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>{t('library.uploadFirst')}</span>
@@ -307,7 +312,7 @@ function GridBookCard({ book, onDelete }: BookCardProps) {
   const { t } = useLanguage();
 
   return (
-    <div className="card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl group relative">
+    <div className="card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl group relative hover-lift border-animated">
       <Link href={`/viewer/${book.id}`}>
         {/* Thumbnail */}
         <div className="relative aspect-[3/4] overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
@@ -315,23 +320,26 @@ function GridBookCard({ book, onDelete }: BookCardProps) {
             <img
               src={getFullImageUrl(book.thumbnail_url)}
               alt={book.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
-              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12" style={{ color: '#f27794' }} />
+            <div className="w-full h-full flex items-center justify-center shine" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
+              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 animate-bounce-soft" style={{ color: '#f27794' }} />
             </div>
           )}
 
+          {/* Overlay gradient on hover */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
           {/* Page count */}
-          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-[10px] sm:text-xs text-white font-medium">
+          <div className="absolute bottom-2 right-2 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-[10px] sm:text-xs text-white font-medium group-hover:bg-brand-primary/80 transition-colors duration-300">
             {book.page_count} {t('library.page')}
           </div>
         </div>
 
         {/* Info */}
         <div className="p-3 sm:p-4">
-          <h3 className="font-medium sm:font-semibold text-sm sm:text-base truncate transition-colors" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="font-medium sm:font-semibold text-sm sm:text-base truncate transition-colors group-hover:text-brand-400" style={{ color: 'var(--text-primary)' }}>
             {book.title}
           </h3>
           {book.description && (
@@ -384,9 +392,9 @@ interface ListBookCardProps extends BookCardProps {
 function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
   const { t } = useLanguage();
   return (
-    <div className="card rounded-xl overflow-hidden flex gap-3 sm:gap-4 p-3 sm:p-4 transition-colors">
+    <div className="card rounded-xl overflow-hidden flex gap-3 sm:gap-4 p-3 sm:p-4 transition-all duration-300 hover-lift group">
       <Link href={`/viewer/${book.id}`} className="flex-shrink-0">
-        <div className="w-16 h-22 sm:w-20 sm:h-28 rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+        <div className="w-16 h-22 sm:w-20 sm:h-28 rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-105" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
           {book.thumbnail_url ? (
             <img
               src={getFullImageUrl(book.thumbnail_url)}
@@ -394,7 +402,7 @@ function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
+            <div className="w-full h-full flex items-center justify-center shine" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#f27794' }} />
             </div>
           )}
@@ -403,7 +411,7 @@ function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
 
       <div className="flex-1 min-w-0">
         <Link href={`/viewer/${book.id}`}>
-          <h3 className="font-medium sm:font-semibold text-sm sm:text-base transition-colors truncate" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="font-medium sm:font-semibold text-sm sm:text-base transition-colors truncate group-hover:text-brand-400" style={{ color: 'var(--text-primary)' }}>
             {book.title}
           </h3>
         </Link>
@@ -415,8 +423,8 @@ function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
         )}
 
         <div className="flex items-center gap-3 sm:gap-4 mt-2 text-[10px] sm:text-xs" style={{ color: 'var(--text-tertiary)' }}>
-          <span className="flex items-center gap-1">
-            <FileText className="w-3 h-3" />
+          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(92, 0, 37, 0.1)' }}>
+            <FileText className="w-3 h-3" style={{ color: '#f27794' }} />
             {book.page_count} {t('library.page')}
           </span>
           <span className="flex items-center gap-1">
@@ -428,7 +436,7 @@ function ListBookCard({ book, onDelete, formatDate }: ListBookCardProps) {
 
       <button
         onClick={() => onDelete(book.id)}
-        className="p-1.5 sm:p-2 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors self-start"
+        className="p-1.5 sm:p-2 rounded-lg text-red-400 hover:bg-red-500/20 transition-all duration-300 self-start hover:scale-110"
         title={t('common.delete')}
       >
         <Trash2 className="w-4 h-4" />

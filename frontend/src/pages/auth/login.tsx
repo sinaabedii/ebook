@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Phone, ArrowRight, Loader2, CheckCircle, AlertCircle, BookOpen, Sparkles } from 'lucide-react';
+import { Phone, ArrowRight, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { authApi, handleApiError } from '@/api/djangoApi';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts';
@@ -208,13 +208,13 @@ export default function LoginPage() {
 
         <div className="w-full max-w-sm sm:max-w-md relative z-10">
           {/* Logo/Header */}
-          <div className="text-center mb-6 sm:mb-8">
+          <div className="text-center mb-6 sm:mb-8 animate-fade-in-down">
             <Link href="/" className="inline-block">
-              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl text-white mb-3 sm:mb-4 shadow-lg" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
-                <BookOpen className="w-7 h-7 sm:w-8 sm:h-8" />
+              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl mb-3 sm:mb-4 shadow-lg hover-scale overflow-hidden" style={{ boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
+                <img src="/logo/logo.png" alt="Logo" className="w-full h-full object-cover" />
               </div>
             </Link>
-            <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('home.title')}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gradient">{t('home.title')}</h1>
             <p className="mt-2 text-sm sm:text-base" style={{ color: 'var(--text-secondary)' }}>
               {step === 'phone' && t('auth.loginSubtitle')}
               {step === 'otp' && t('auth.enterCode')}
@@ -223,20 +223,20 @@ export default function LoginPage() {
           </div>
 
           {/* Card */}
-          <div className="card rounded-xl sm:rounded-2xl p-5 sm:p-8">
+          <div className="card rounded-xl sm:rounded-2xl p-5 sm:p-8 animate-fade-in-up glass-premium">
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 animate-fade-in-up">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 animate-wiggle" />
                 <span className="text-sm">{error}</span>
               </div>
             )}
 
             {/* Success Message */}
             {success && step === 'otp' && (
-              <div className="mb-6 p-4 bg-accent-500/10 border border-accent-500/20 rounded-xl flex items-center gap-3 text-accent-400">
-                <CheckCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{success}</span>
+              <div className="mb-6 p-4 rounded-xl flex items-center gap-3 animate-fade-in-up" style={{ backgroundColor: 'rgba(92, 0, 37, 0.1)', border: '1px solid rgba(92, 0, 37, 0.3)' }}>
+                <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f27794' }} />
+                <span className="text-sm" style={{ color: '#f27794' }}>{success}</span>
               </div>
             )}
 
@@ -250,13 +250,13 @@ export default function LoginPage() {
 
             {/* Phone Step */}
             {step === 'phone' && (
-              <form onSubmit={handleRequestOtp}>
+              <form onSubmit={handleRequestOtp} className="animate-fade-in-up">
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-surface-300 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                     شماره موبایل
                   </label>
-                  <div className="relative">
-                    <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-500" />
+                  <div className="relative group">
+                    <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors" style={{ color: 'var(--text-tertiary)' }} />
                     <input
                       type="tel"
                       value={formatPhone(phone)}
@@ -272,7 +272,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading || phone.length !== 11}
-                  className="btn-primary w-full py-3"
+                  className="btn-primary w-full py-3 hover-lift shine"
                 >
                   {isLoading ? (
                     <>
@@ -288,9 +288,9 @@ export default function LoginPage() {
 
             {/* OTP Step */}
             {step === 'otp' && (
-              <form onSubmit={handleVerifyOtp}>
+              <form onSubmit={handleVerifyOtp} className="animate-fade-in-up">
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-surface-300 mb-4 text-center">
+                  <label className="block text-sm font-medium mb-4 text-center" style={{ color: 'var(--text-secondary)' }}>
                     کد ۶ رقمی ارسال شده به {formatPhone(phone)}
                   </label>
                   
@@ -306,8 +306,13 @@ export default function LoginPage() {
                         onChange={e => handleOtpChange(index, e.target.value)}
                         onKeyDown={e => handleOtpKeyDown(index, e)}
                         onPaste={handleOtpPaste}
-                        className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold bg-surface-800 border-2 border-surface-700 rounded-lg sm:rounded-xl text-white outline-none transition-all"
-                        style={{ borderColor: 'var(--border-color)' }}
+                        className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-lg sm:rounded-xl outline-none transition-all duration-300 hover-scale"
+                        style={{ 
+                          backgroundColor: 'var(--bg-secondary)', 
+                          border: '2px solid var(--border-color)', 
+                          color: 'var(--text-primary)',
+                          animationDelay: `${index * 50}ms` 
+                        }}
                         onFocus={(e) => { e.target.style.borderColor = '#5c0025'; e.target.style.boxShadow = '0 0 0 3px rgba(92, 0, 37, 0.2)'; }}
                         onBlur={(e) => { e.target.style.borderColor = 'var(--border-color)'; e.target.style.boxShadow = 'none'; }}
                       />
@@ -318,7 +323,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading || otp.join('').length !== 6}
-                  className="btn-primary w-full py-3"
+                  className="btn-primary w-full py-3 hover-lift shine"
                 >
                   {isLoading ? (
                     <>
@@ -332,14 +337,14 @@ export default function LoginPage() {
 
                 <div className="mt-4 text-center">
                   {countdown > 0 ? (
-                    <p className="text-sm text-surface-500">
+                    <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
                       ارسال مجدد کد تا {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
                     </p>
                   ) : (
                     <button
                       type="button"
                       onClick={handleResendOtp}
-                      className="text-sm transition-colors"
+                      className="text-sm transition-colors hover-scale"
                       style={{ color: '#f27794' }}
                     >
                       ارسال مجدد کد
@@ -350,7 +355,8 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setStep('phone'); setOtp(['', '', '', '', '', '']); setError(''); }}
-                  className="w-full mt-4 py-2 text-surface-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
+                  className="w-full mt-4 py-2 flex items-center justify-center gap-2 transition-all duration-300 hover-scale"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   <ArrowRight className="w-4 h-4" />
                   تغییر شماره موبایل
@@ -360,10 +366,10 @@ export default function LoginPage() {
 
             {/* Register Step */}
             {step === 'register' && (
-              <form onSubmit={handleRegister}>
+              <form onSubmit={handleRegister} className="animate-fade-in-up">
                 <div className="space-y-4 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-surface-300 mb-2">
+                  <div className="animate-slide-in-right" style={{ animationDelay: '100ms' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                       نام
                     </label>
                     <input
@@ -376,8 +382,8 @@ export default function LoginPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-surface-300 mb-2">
+                  <div className="animate-slide-in-right" style={{ animationDelay: '200ms' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                       نام خانوادگی
                     </label>
                     <input
@@ -389,8 +395,8 @@ export default function LoginPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-surface-300 mb-2">
+                  <div className="animate-slide-in-right" style={{ animationDelay: '300ms' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                       کد سازمان (اختیاری)
                     </label>
                     <input
@@ -407,7 +413,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="btn-primary w-full py-3"
+                  className="btn-primary w-full py-3 hover-lift shine"
                 >
                   {isLoading ? (
                     <>
@@ -422,7 +428,8 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setStep('otp'); setError(''); }}
-                  className="w-full mt-4 py-2 text-surface-400 hover:text-white flex items-center justify-center gap-2 transition-colors"
+                  className="w-full mt-4 py-2 flex items-center justify-center gap-2 transition-all duration-300 hover-scale"
+                  style={{ color: 'var(--text-secondary)' }}
                 >
                   <ArrowRight className="w-4 h-4" />
                   بازگشت
@@ -432,7 +439,7 @@ export default function LoginPage() {
           </div>
 
           {/* Footer */}
-          <p className="text-center text-sm text-surface-500 mt-6">
+          <p className="text-center text-sm mt-6" style={{ color: 'var(--text-tertiary)' }}>
             با ورود به سامانه، <Link href="/terms" className="transition-colors" style={{ color: '#f27794' }}>قوانین و مقررات</Link> را می‌پذیرید
           </p>
         </div>

@@ -351,9 +351,40 @@ interface ApiErrorData {
 }
 
 /**
+ * Error keys for translation
+ */
+export type ErrorKey = 'networkError' | 'unknownError' | 'serverError';
+
+/**
+ * Extracts error key from API error for translation
+ * @param error - Error object from API call
+ * @returns Error key or direct message from server
+ */
+export function getApiErrorKey(error: unknown): { key: ErrorKey; message?: string; status?: number } {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<ApiErrorData>;
+
+    if (axiosError.response) {
+      const data = axiosError.response.data;
+      if (typeof data === 'string') return { key: 'serverError', message: data };
+      if (data?.message) return { key: 'serverError', message: data.message };
+      if (data?.detail) return { key: 'serverError', message: data.detail };
+      if (data?.error) return { key: 'serverError', message: data.error };
+      return { key: 'serverError', status: axiosError.response.status };
+    }
+
+    if (axiosError.request) {
+      return { key: 'networkError' };
+    }
+  }
+
+  return { key: 'unknownError' };
+}
+
+/**
  * Extracts user-friendly error message from API error
  * @param error - Error object from API call
- * @returns User-friendly error message in Persian
+ * @returns User-friendly error message in Persian (legacy support)
  */
 export function handleApiError(error: unknown): string {
   if (axios.isAxiosError(error)) {
@@ -365,15 +396,15 @@ export function handleApiError(error: unknown): string {
       if (data?.message) return data.message;
       if (data?.detail) return data.detail;
       if (data?.error) return data.error;
-      return `خطای سرور: ${axiosError.response.status}`;
+      return `Server Error: ${axiosError.response.status}`;
     }
 
     if (axiosError.request) {
-      return 'ارتباط با سرور برقرار نشد';
+      return 'errors.networkError';
     }
   }
 
-  return 'خطای ناشناخته رخ داد';
+  return 'errors.unknownError';
 }
 
 // =============================================================================

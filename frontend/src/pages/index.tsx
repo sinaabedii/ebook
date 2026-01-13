@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { ResponsiveLayout } from '@/components/layout';
 import { bookApi, getFullImageUrl, handleApiError } from '@/api/djangoApi';
-import { useResponsive } from '@/hooks';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts';
 import type { Book } from '@/types';
@@ -12,7 +11,6 @@ import {
   BookOpen, 
   Clock, 
   FileText, 
-  ArrowLeft,
   Sparkles,
   Zap,
   Shield,
@@ -21,9 +19,12 @@ import {
   Layers
 } from 'lucide-react';
 
+// Dynamic import for Lottie to avoid SSR issues
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+import bookAnimation from '../../public/json/Book Idea.json';
+
 export default function HomePage() {
-  const { isMobile, isTablet } = useResponsive();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { t, language } = useLanguage();
   const [recentBooks, setRecentBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,20 +37,22 @@ export default function HomePage() {
         const response = await bookApi.getBooks(1, 8);
         setRecentBooks(response.results);
       } catch (err) {
-        setError(handleApiError(err));
+        const errorKey = handleApiError(err);
+        // Check if it's a translation key or direct message
+        setError(errorKey.startsWith('errors.') ? t(errorKey) : errorKey);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchBooks();
-  }, []);
+  }, [t]);
 
   return (
     <ResponsiveLayout showNav={true}>
       {/* Hero Section */}
-      <section className="relative mb-8 sm:mb-12 lg:mb-16">
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl card">
+      <section className="relative mb-8 sm:mb-12 lg:mb-16 animate-fade-in-up">
+        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl card shine">
           {/* Decorative Elements */}
           <div className="absolute top-0 left-0 w-48 sm:w-72 lg:w-96 h-48 sm:h-72 lg:h-96 bg-brand-800/30 rounded-full blur-[80px] sm:blur-[100px] lg:blur-[120px] -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-40 sm:w-60 lg:w-80 h-40 sm:h-60 lg:h-80 bg-brand-700/20 rounded-full blur-[60px] sm:blur-[80px] lg:blur-[100px] translate-x-1/3 translate-y-1/3" />
@@ -58,14 +61,14 @@ export default function HomePage() {
             <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
               {/* Content */}
               <div className={`flex-1 text-center ${language === 'fa' ? 'lg:text-right' : 'lg:text-left'}`}>
-                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-brand-900/20 border border-brand-800/30 text-brand-400 text-xs sm:text-sm mb-4 sm:mb-6">
+                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm mb-4 sm:mb-6 animate-bounce-soft" style={{ backgroundColor: 'rgba(92, 0, 37, 0.15)', border: '1px solid rgba(92, 0, 37, 0.25)', color: '#5c0025' }}>
                   <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{t('home.badge')}</span>
                 </div>
                 
                 <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight" style={{ color: 'var(--text-primary)' }}>
                   {t('home.heroTitle1')}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-brand-400 to-brand-900"> {t('home.heroTitle2')} </span>
+                  <span className="text-gradient"> {t('home.heroTitle2')} </span>
                   {t('home.heroTitle3')}
                 </h1>
                 
@@ -74,12 +77,12 @@ export default function HomePage() {
                 </p>
                 
                 <div className={`flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center ${language === 'fa' ? 'lg:justify-start' : 'lg:justify-start'}`}>
-                  <Link href="/upload" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium rounded-xl text-white transition-all shadow-lg" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
+                  <Link href="/upload" className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium rounded-xl text-white transition-all shadow-lg hover-lift" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%)', boxShadow: '0 4px 15px rgba(92, 0, 37, 0.4)' }}>
                     <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>{t('home.startButton')}</span>
                   </Link>
                   
-                  <Link href="/library" className="btn-secondary px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg">
+                  <Link href="/library" className="btn-secondary px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg hover-lift">
                     <Play className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>{t('home.viewBooks')}</span>
                   </Link>
@@ -87,31 +90,32 @@ export default function HomePage() {
                 
                 {/* Stats - Hidden on mobile */}
                 <div className="hidden sm:flex items-center justify-center lg:justify-start gap-6 lg:gap-8 mt-8 lg:mt-10 pt-8 lg:pt-10" style={{ borderTop: '1px solid var(--border-color)' }}>
-                  <div className="text-center">
-                    <p className="text-2xl lg:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{language === 'fa' ? '۱۰۰+' : '100+'}</p>
+                  <div className="text-center animate-fade-in-up delay-100">
+                    <p className="text-2xl lg:text-3xl font-bold text-gradient">{language === 'fa' ? '۱۰۰+' : '100+'}</p>
                     <p className="text-xs lg:text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('common.books')}</p>
                   </div>
                   <div className="w-px h-10 lg:h-12" style={{ backgroundColor: 'var(--border-color)' }} />
-                  <div className="text-center">
-                    <p className="text-2xl lg:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{language === 'fa' ? '۵۰+' : '50+'}</p>
+                  <div className="text-center animate-fade-in-up delay-200">
+                    <p className="text-2xl lg:text-3xl font-bold text-gradient">{language === 'fa' ? '۵۰+' : '50+'}</p>
                     <p className="text-xs lg:text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('common.users')}</p>
                   </div>
                   <div className="w-px h-10 lg:h-12" style={{ backgroundColor: 'var(--border-color)' }} />
-                  <div className="text-center">
-                    <p className="text-2xl lg:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{language === 'fa' ? '۴.۹' : '4.9'}</p>
+                  <div className="text-center animate-fade-in-up delay-300">
+                    <p className="text-2xl lg:text-3xl font-bold text-gradient">{language === 'fa' ? '۴.۹' : '4.9'}</p>
                     <p className="text-xs lg:text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('common.rating')}</p>
                   </div>
                 </div>
               </div>
               
-              {/* 3D Book Preview - Only on large screens */}
-              <div className="hidden xl:block flex-shrink-0">
-                <div className="relative w-64 h-80 rounded-lg shadow-2xl shadow-black/50 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #8a1945 0%, #5c0025 50%, #3d0018 100%)' }}>
-                  <div className="text-center p-6">
-                    <BookOpen className="w-14 h-14 mx-auto mb-4" style={{ color: '#f27794' }} />
-                    <p className="font-bold text-lg" style={{ color: '#fde6ea' }}>{t('common.yourLibrary')}</p>
-                    <p className="text-sm mt-2" style={{ color: 'rgba(253, 230, 234, 0.7)' }}>{t('common.alwaysAvailable')}</p>
-                  </div>
+              {/* Lottie Animation - Visible on tablet and up */}
+              <div className="hidden md:flex flex-shrink-0 items-center justify-center hover-scale">
+                <div className="relative w-48 h-48 sm:w-56 sm:h-56 lg:w-72 lg:h-72 xl:w-80 xl:h-80">
+                  <Lottie 
+                    animationData={bookAnimation}
+                    loop={true}
+                    autoplay={true}
+                    className="w-full h-full drop-shadow-2xl"
+                  />
                 </div>
               </div>
             </div>
@@ -120,9 +124,9 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="mb-8 sm:mb-12 lg:mb-16">
+      <section className="mb-8 sm:mb-12 lg:mb-16 animate-fade-in-up delay-200">
         <div className="text-center mb-6 sm:mb-8 lg:mb-10">
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-4" style={{ color: 'var(--text-primary)' }}>
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-4 text-gradient">
             {t('home.whyUs')}
           </h2>
           <p className="text-sm sm:text-base max-w-2xl mx-auto px-4" style={{ color: 'var(--text-secondary)' }}>
@@ -131,38 +135,46 @@ export default function HomePage() {
         </div>
         
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-          <FeatureCard
-            icon={<FileText className="w-5 h-5 sm:w-6 sm:h-6" />}
-            title={t('home.featurePdf')}
-            description={t('home.featurePdfDesc')}
-            color="primary"
-          />
-          <FeatureCard
-            icon={<Layers className="w-5 h-5 sm:w-6 sm:h-6" />}
-            title={t('home.feature3d')}
-            description={t('home.feature3dDesc')}
-            color="accent"
-          />
-          <FeatureCard
-            icon={<Zap className="w-5 h-5 sm:w-6 sm:h-6" />}
-            title={t('home.featureSpeed')}
-            description={t('home.featureSpeedDesc')}
-            color="yellow"
-          />
-          <FeatureCard
-            icon={<Shield className="w-5 h-5 sm:w-6 sm:h-6" />}
-            title={t('home.featureSecurity')}
-            description={t('home.featureSecurityDesc')}
-            color="blue"
-          />
+          <div className="animate-fade-in-up delay-100">
+            <FeatureCard
+              icon={<FileText className="w-5 h-5 sm:w-6 sm:h-6" />}
+              title={t('home.featurePdf')}
+              description={t('home.featurePdfDesc')}
+              color="primary"
+            />
+          </div>
+          <div className="animate-fade-in-up delay-200">
+            <FeatureCard
+              icon={<Layers className="w-5 h-5 sm:w-6 sm:h-6" />}
+              title={t('home.feature3d')}
+              description={t('home.feature3dDesc')}
+              color="accent"
+            />
+          </div>
+          <div className="animate-fade-in-up delay-300">
+            <FeatureCard
+              icon={<Zap className="w-5 h-5 sm:w-6 sm:h-6" />}
+              title={t('home.featureSpeed')}
+              description={t('home.featureSpeedDesc')}
+              color="yellow"
+            />
+          </div>
+          <div className="animate-fade-in-up delay-400">
+            <FeatureCard
+              icon={<Shield className="w-5 h-5 sm:w-6 sm:h-6" />}
+              title={t('home.featureSecurity')}
+              description={t('home.featureSecurityDesc')}
+              color="blue"
+            />
+          </div>
         </div>
       </section>
 
       {/* Recent Books Section */}
-      <section className="mb-8 sm:mb-12 lg:mb-16">
+      <section className="mb-8 sm:mb-12 lg:mb-16 animate-fade-in-up delay-300">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 sm:mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-1 sm:mb-2 text-gradient">
               {t('home.recentBooks')}
             </h2>
             <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>{t('home.recentBooksDesc')}</p>
@@ -170,7 +182,7 @@ export default function HomePage() {
           
           <Link
             href="/library"
-            className="inline-flex items-center gap-2 text-sm transition-colors"
+            className="inline-flex items-center gap-2 text-sm transition-all duration-300 hover-scale"
             style={{ color: '#f27794' }}
           >
             <span>{t('home.viewAll')}</span>
@@ -203,15 +215,15 @@ export default function HomePage() {
 
       {/* CTA Section */}
       {!isAuthenticated && (
-        <section className="mb-8">
-          <div className="card p-8 sm:p-12 text-center bg-gradient-to-br from-brand-900/20 to-brand-800/10 border-brand-800/30">
-            <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+        <section className="mb-8 animate-fade-in-up">
+          <div className="card p-8 sm:p-12 text-center border-animated shine" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.15), rgba(92, 0, 37, 0.05))', borderColor: 'rgba(92, 0, 37, 0.3)' }}>
+            <h3 className="text-2xl font-bold mb-4 text-gradient">
               {t('common.startNow')}
             </h3>
             <p className="mb-6 max-w-md mx-auto" style={{ color: 'var(--text-secondary)' }}>
               {t('common.freeRegisterDesc')}
             </p>
-            <Link href="/auth/login" className="btn-primary px-8 py-3">
+            <Link href="/auth/login" className="btn-primary px-8 py-3 hover-lift">
               {t('common.freeRegister')}
             </Link>
           </div>
@@ -230,19 +242,26 @@ interface FeatureCardProps {
 }
 
 const colorClasses = {
-  primary: 'bg-brand-900/20 text-brand-400 border-brand-800/30',
-  accent: 'bg-accent-500/10 text-accent-400 border-accent-500/20',
-  yellow: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  primary: 'border',
+  accent: 'border',
+  yellow: 'border',
+  blue: 'border',
+};
+
+const colorStyles = {
+  primary: { backgroundColor: 'rgba(92, 0, 37, 0.12)', color: '#5c0025', borderColor: 'rgba(92, 0, 37, 0.2)' },
+  accent: { backgroundColor: 'rgba(34, 197, 94, 0.12)', color: '#16a34a', borderColor: 'rgba(34, 197, 94, 0.2)' },
+  yellow: { backgroundColor: 'rgba(234, 179, 8, 0.12)', color: '#ca8a04', borderColor: 'rgba(234, 179, 8, 0.2)' },
+  blue: { backgroundColor: 'rgba(59, 130, 246, 0.12)', color: '#2563eb', borderColor: 'rgba(59, 130, 246, 0.2)' },
 };
 
 function FeatureCard({ icon, title, description, color }: FeatureCardProps) {
   return (
-    <div className="card rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:shadow-xl group">
-      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 border ${colorClasses[color]} group-hover:scale-110 transition-transform`}>
+    <div className="card rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:shadow-xl group hover-lift border-animated">
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 ${colorClasses[color]} group-hover:scale-110 transition-transform duration-300 shine`} style={colorStyles[color]}>
         {icon}
       </div>
-      <h3 className="text-sm sm:text-base lg:text-lg font-semibold mb-1 sm:mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+      <h3 className="text-sm sm:text-base lg:text-lg font-semibold mb-1 sm:mb-2 group-hover:text-gradient transition-all" style={{ color: 'var(--text-primary)' }}>{title}</h3>
       <p className="text-xs sm:text-sm leading-relaxed hidden sm:block" style={{ color: 'var(--text-tertiary)' }}>{description}</p>
     </div>
   );
@@ -265,17 +284,17 @@ function BookCardSkeleton() {
 function EmptyState() {
   const { t } = useLanguage();
   return (
-    <div className="card p-12 text-center">
-      <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
-        <BookOpen className="w-10 h-10" style={{ color: 'var(--text-tertiary)' }} />
+    <div className="card p-12 text-center animate-scale-in">
+      <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shine" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))' }}>
+        <BookOpen className="w-10 h-10 animate-bounce-soft" style={{ color: '#f27794' }} />
       </div>
-      <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+      <h3 className="text-xl font-semibold mb-2 text-gradient">
         {t('home.noBooks')}
       </h3>
       <p className="mb-6 max-w-sm mx-auto" style={{ color: 'var(--text-tertiary)' }}>
         {t('home.noBooksDesc')}
       </p>
-      <Link href="/upload" className="btn-primary">
+      <Link href="/upload" className="btn-primary hover-lift shine">
         <Upload className="w-5 h-5" />
         <span>{t('library.uploadFirst')}</span>
       </Link>
@@ -296,23 +315,26 @@ function BookCard({ book }: BookCardProps) {
 
   return (
     <Link href={`/viewer/${book.id}`} className="block group">
-      <div className="card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div className="card rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover-lift border-animated">
         {/* Book Cover */}
         <div className="relative aspect-[3/4] overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
           {book.thumbnail_url ? (
             <img
               src={getFullImageUrl(book.thumbnail_url)}
               alt={book.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
-              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12" style={{ color: '#f27794' }} />
+            <div className="w-full h-full flex items-center justify-center shine" style={{ background: 'linear-gradient(135deg, #5c0025 0%, #3d0018 100%)' }}>
+              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 animate-bounce-soft" style={{ color: '#f27794' }} />
             </div>
           )}
           
+          {/* Overlay gradient on hover */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
           {/* Page count badge */}
-          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-[10px] sm:text-xs text-white font-medium">
+          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-[10px] sm:text-xs text-white font-medium group-hover:bg-brand-primary/80 transition-colors duration-300">
             {book.page_count} {t('library.page')}
           </div>
 
@@ -329,7 +351,7 @@ function BookCard({ book }: BookCardProps) {
 
         {/* Info */}
         <div className="p-3 sm:p-4">
-          <h3 className="font-medium sm:font-semibold text-sm sm:text-base mb-1 truncate group-hover:text-brand-400 transition-colors" style={{ color: 'var(--text-primary)' }}>
+          <h3 className="font-medium sm:font-semibold text-sm sm:text-base mb-1 truncate group-hover:text-brand-400 transition-colors duration-300" style={{ color: 'var(--text-primary)' }}>
             {book.title}
           </h3>
           <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs" style={{ color: 'var(--text-tertiary)' }}>

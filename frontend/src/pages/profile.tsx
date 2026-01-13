@@ -113,9 +113,9 @@ export default function ProfilePage() {
       <ResponsiveLayout title="پروفایل" showBackButton>
         <div className="max-w-2xl mx-auto">
           {/* Header Card */}
-          <div className="card p-6 mb-6">
+          <div className="card p-6 mb-6 animate-fade-in-up hover-lift">
             <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-2xl border flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))', borderColor: 'rgba(92, 0, 37, 0.3)' }}>
+              <div className="w-20 h-20 rounded-2xl border flex items-center justify-center shine" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))', borderColor: 'rgba(92, 0, 37, 0.3)' }}>
                 {user.avatar ? (
                   <img src={user.avatar} alt="" className="w-full h-full rounded-2xl object-cover" />
                 ) : (
@@ -123,18 +123,18 @@ export default function ProfilePage() {
                 )}
               </div>
               <div className="flex-1">
-                <h1 className="text-xl font-bold text-white mb-1">
+                <h1 className="text-xl font-bold text-gradient mb-1">
                   {user.full_name || user.first_name || 'کاربر'}
                 </h1>
-                <p className="text-surface-400 ltr text-sm" dir="ltr">{user.phone}</p>
+                <p className="ltr text-sm" dir="ltr" style={{ color: 'var(--text-secondary)' }}>{user.phone}</p>
                 {user.organization_name && (
-                  <span className="badge-primary mt-2">
+                  <span className="badge-primary mt-2 animate-scale-in">
                     <Building2 className="w-3.5 h-3.5" />
                     {user.organization_name}
                   </span>
                 )}
               </div>
-              <div className="badge-success">
+              <div className="badge-success pulse-ring">
                 <Sparkles className="w-3.5 h-3.5" />
                 فعال
               </div>
@@ -143,26 +143,26 @@ export default function ProfilePage() {
 
           {/* Messages */}
           {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400">
-              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 animate-fade-in-up">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 animate-wiggle" />
               <span className="text-sm">{error}</span>
             </div>
           )}
           {success && (
-            <div className="mb-6 p-4 bg-accent-500/10 border border-accent-500/20 rounded-xl flex items-center gap-3 text-accent-400">
-              <CheckCircle className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{success}</span>
+            <div className="mb-6 p-4 rounded-xl flex items-center gap-3 animate-fade-in-up" style={{ backgroundColor: 'rgba(92, 0, 37, 0.1)', border: '1px solid rgba(92, 0, 37, 0.3)' }}>
+              <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: '#f27794' }} />
+              <span className="text-sm" style={{ color: '#f27794' }}>{success}</span>
             </div>
           )}
 
           {/* Profile Form */}
-          <div className="card p-6">
+          <div className="card p-6 animate-fade-in-up delay-100">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-white">اطلاعات شخصی</h2>
+              <h2 className="text-lg font-semibold text-gradient">اطلاعات شخصی</h2>
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="btn-ghost text-sm"
+                  className="btn-ghost text-sm hover-scale"
                 >
                   <Edit2 className="w-4 h-4" />
                   ویرایش
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                 {/* Name Fields */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-surface-400 mb-2">نام</label>
+                    <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>نام</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -186,11 +186,11 @@ export default function ProfilePage() {
                         placeholder="نام خود را وارد کنید"
                       />
                     ) : (
-                      <p className="text-white py-3">{user.first_name || '-'}</p>
+                      <p className="py-3" style={{ color: 'var(--text-primary)' }}>{user.first_name || '-'}</p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm text-surface-400 mb-2">نام خانوادگی</label>
+                    <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>نام خانوادگی</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -201,14 +201,14 @@ export default function ProfilePage() {
                         placeholder="نام خانوادگی خود را وارد کنید"
                       />
                     ) : (
-                      <p className="text-white py-3">{user.last_name || '-'}</p>
+                      <p className="py-3" style={{ color: 'var(--text-primary)' }}>{user.last_name || '-'}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm text-surface-400 mb-2">ایمیل</label>
+                  <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>ایمیل</label>
                   {isEditing ? (
                     <input
                       type="email"
@@ -220,13 +220,13 @@ export default function ProfilePage() {
                       placeholder="email@example.com"
                     />
                   ) : (
-                    <p className="text-white py-3 ltr" dir="ltr">{user.email || '-'}</p>
+                    <p className="py-3 ltr" dir="ltr" style={{ color: 'var(--text-primary)' }}>{user.email || '-'}</p>
                   )}
                 </div>
 
                 {/* National ID */}
                 <div>
-                  <label className="block text-sm text-surface-400 mb-2">کد ملی</label>
+                  <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>کد ملی</label>
                   {isEditing ? (
                     <input
                       type="text"
@@ -239,37 +239,37 @@ export default function ProfilePage() {
                       placeholder="۱۲۳۴۵۶۷۸۹۰"
                     />
                   ) : (
-                    <p className="text-white py-3 ltr" dir="ltr">{user.national_id || '-'}</p>
+                    <p className="py-3 ltr" dir="ltr" style={{ color: 'var(--text-primary)' }}>{user.national_id || '-'}</p>
                   )}
                 </div>
 
                 {/* Read-only fields */}
-                <div className="grid sm:grid-cols-3 gap-4 pt-6 border-t border-surface-800">
-                  <div className="flex items-center gap-3 p-3 bg-surface-800/50 rounded-xl">
-                    <div className="p-2 rounded-lg bg-surface-700">
-                      <Phone className="w-4 h-4 text-surface-400" />
+                <div className="grid sm:grid-cols-3 gap-4 pt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
+                  <div className="flex items-center gap-3 p-3 rounded-xl hover-lift transition-all duration-300" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                    <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))' }}>
+                      <Phone className="w-4 h-4" style={{ color: '#f27794' }} />
                     </div>
                     <div>
-                      <p className="text-xs text-surface-500">شماره موبایل</p>
-                      <p className="text-white text-sm ltr" dir="ltr">{user.phone}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>شماره موبایل</p>
+                      <p className="text-sm ltr" dir="ltr" style={{ color: 'var(--text-primary)' }}>{user.phone}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-surface-800/50 rounded-xl">
-                    <div className="p-2 rounded-lg bg-surface-700">
-                      <Shield className="w-4 h-4 text-surface-400" />
+                  <div className="flex items-center gap-3 p-3 rounded-xl hover-lift transition-all duration-300" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                    <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))' }}>
+                      <Shield className="w-4 h-4" style={{ color: '#f27794' }} />
                     </div>
                     <div>
-                      <p className="text-xs text-surface-500">نقش</p>
-                      <p className="text-white text-sm">{getRoleName(user.role)}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>نقش</p>
+                      <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{getRoleName(user.role)}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-surface-800/50 rounded-xl">
-                    <div className="p-2 rounded-lg bg-surface-700">
-                      <Calendar className="w-4 h-4 text-surface-400" />
+                  <div className="flex items-center gap-3 p-3 rounded-xl hover-lift transition-all duration-300" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                    <div className="p-2 rounded-lg" style={{ background: 'linear-gradient(135deg, rgba(92, 0, 37, 0.2), rgba(92, 0, 37, 0.1))' }}>
+                      <Calendar className="w-4 h-4" style={{ color: '#f27794' }} />
                     </div>
                     <div>
-                      <p className="text-xs text-surface-500">تاریخ عضویت</p>
-                      <p className="text-white text-sm">
+                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>تاریخ عضویت</p>
+                      <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                         {new Date(user.date_joined).toLocaleDateString('fa-IR')}
                       </p>
                     </div>
@@ -278,11 +278,11 @@ export default function ProfilePage() {
 
                 {/* Action Buttons */}
                 {isEditing && (
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex gap-3 pt-4 animate-fade-in-up">
                     <button
                       type="submit"
                       disabled={isSaving}
-                      className="btn-primary"
+                      className="btn-primary hover-lift"
                     >
                       {isSaving ? (
                         <>
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="btn-secondary"
+                      className="btn-secondary hover-lift"
                     >
                       <X className="w-4 h-4" />
                       انصراف
